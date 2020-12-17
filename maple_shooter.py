@@ -47,7 +47,10 @@ character_speed = 0.3
 character_HP = 100
 character_MP = 100
 character_Exp = 0
+character_Level = 1
 MAX_Exp = 100
+MAX_HP = 100
+MAX_MP = 100
 invincibility = 0
 
 character_to_x_LEFT = 0 
@@ -149,6 +152,14 @@ while running:
         Slime = False
         Shoot = False
         character_Exp += 10
+        if character_Exp >= MAX_Exp:
+            character_Exp -= MAX_Exp
+            character_Level += 1
+            MAX_Exp += MAX_Exp * 0.1
+            MAX_HP += MAX_HP * 0.1
+            MAX_MP += MAX_MP * 0.1
+            character_HP = MAX_HP
+            character_MP = MAX_MP
         enemy_slime_x_pos = -1000
         enemy_slime_regen_time = elapsed_time
     elif (arrow_x_pos < 0) or (arrow_x_pos > (screen_width - arrow_width)) or (arrow_y_pos > screen_height):
@@ -180,12 +191,12 @@ while running:
 
     # 게임 화면 표시
     timer = game_font.render("Time : {}".format(int(elapsed_time)), True, (255, 255, 255))
-    HP = game_font.render("HP : {}".format(int(character_HP)), True, (255, 0, 0))
-    MP = game_font.render("MP : {}".format(int(character_MP)), True, (0, 0, 255))
+    HP = game_font.render("HP : {} / {}".format(int(character_HP), int(MAX_HP)), True, (255, 0, 0))
+    MP = game_font.render("MP : {} / {}".format(int(character_MP), int(MAX_MP)), True, (0, 0, 255))
     Exp = game_font.render("Exp : {} / {}".format(int(character_Exp), int(MAX_Exp)), True, (255, 255, 0))
 
     # 5. 화면에 그리기
-    screen.blit(background, (0, 0))
+    screen.blit(background, (0, 0)) 
     if invincibility == True: # 무적 시간에 깜빡임 구현 (더 나은 방안이 있으면 수정 바람)
         if ((pygame.time.get_ticks() - start_ticks) / 1000 - invincibility_time) <= 0.25 or (((pygame.time.get_ticks() - start_ticks) / 1000 - invincibility_time) >= 0.5 and ((pygame.time.get_ticks() - start_ticks) / 1000 - invincibility_time) <= 0.75):
             pass
@@ -215,8 +226,8 @@ while running:
         else:
             screen.blit(arrow_RIGHT, (arrow_x_pos, arrow_y_pos))
     screen.blit(timer, (10, 10)) # 필수들
-    screen.blit(HP, ((screen_width - 150), 10))
-    screen.blit(MP, ((screen_width - 150), 40))
+    screen.blit(HP, ((screen_width - 200), 10))
+    screen.blit(MP, ((screen_width - 200), 40))
     screen.blit(Exp, ((screen_width - 500), 10))
     pygame.display.update() 
 
