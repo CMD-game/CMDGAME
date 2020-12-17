@@ -83,6 +83,7 @@ start_ticks = pygame.time.get_ticks()
 running = True
 Slime = True 
 Shoot = False
+invincibility = 0
 while running:
     dt = clock.tick(60) # 프레임 수
 
@@ -170,7 +171,7 @@ while running:
                 running = False
 
     elapsed_time = (pygame.time.get_ticks() - start_ticks) / 1000
-    if invincibility == 
+    if invincibility == 2:
         invincibility_time = elapsed_time
         invincibility = 1
     if invincibility == 1:
