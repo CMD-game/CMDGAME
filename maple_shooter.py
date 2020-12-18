@@ -118,6 +118,8 @@ while running:
                     else:
                         arrow_LEFT = False
                     Shoot = True
+            elif event.key == pygame.K_q: # q키를 누름 : 스킬1
+                pass
         
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
