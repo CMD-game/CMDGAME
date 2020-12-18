@@ -35,6 +35,9 @@ clock = pygame.time.Clock()
 
 background = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_background.png")
 stage = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_stage.png")
+stage_size = stage.get_rect().size
+stage_height = stage_size[1]
+portal = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_portal.png")
 
 character_RIGHT = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_character_RIGHT.png")
 character = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_character_LEFT.png")
@@ -42,7 +45,7 @@ character_size = character.get_rect().size
 character_width = character_size[0]
 character_height = character_size[1]
 character_x_pos = (screen_width - character_width)/ 2
-character_y_pos = screen_height - character_height - 50
+character_y_pos = screen_height - character_height - stage_height
 
 character_speed = 0.3
 character_HP = 100
@@ -73,7 +76,7 @@ enemy_slime_size = enemy_slime.get_rect().size
 enemy_slime_width = enemy_slime_size[0]
 enemy_slime_height = enemy_slime_size[1]
 enemy_slime_x_pos = 0
-enemy_slime_y_pos = screen_height - enemy_slime_height - 50
+enemy_slime_y_pos = screen_height - enemy_slime_height - stage_height
 enemy_slime_regen = 0.5 # 실제 리젠 시간
 enemy_slime_regen_time = 0 # 리젠 시간을 재기 위한 변수(0으로 고정)
 
@@ -199,7 +202,7 @@ while running:
 
     # 5. 화면에 그리기
     screen.blit(background, (0, 0))
-    screen.blit(stage, (0, (screen_height-50))) 
+    screen.blit(stage, (0, (screen_height - stage_height))) 
     if invincibility == True: # 무적 시간에 깜빡임 구현 (더 나은 방안이 있으면 수정 바람)
         if ((pygame.time.get_ticks() - start_ticks) / 1000 - invincibility_time) <= 0.25 or (((pygame.time.get_ticks() - start_ticks) / 1000 - invincibility_time) >= 0.5 and ((pygame.time.get_ticks() - start_ticks) / 1000 - invincibility_time) <= 0.75):
             pass
@@ -232,6 +235,7 @@ while running:
     screen.blit(MP, ((screen_width - 200), 40))
     screen.blit(Exp, ((screen_width - 500), 10))
     screen.blit(Level, (10, 10))
+    screen.blit(portal, ((screen_width - 60), screen_height - stage_height - 60))
     pygame.display.update() 
 
 pygame.quit()
