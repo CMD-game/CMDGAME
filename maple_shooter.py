@@ -40,6 +40,7 @@ stage = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_stage
 stage_size = stage.get_rect().size
 stage_height = stage_size[1]
 portal = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_portal.png")
+Qskill_effect = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_Qskill_effect.png")
 
 character_RIGHT = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_character_RIGHT.png")
 character = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_character_LEFT.png")
@@ -92,6 +93,7 @@ start_ticks = pygame.time.get_ticks()
 running = True
 Slime = True 
 Shoot = False
+Qskill = False
 invincibility = 0
 while running:
     dt = clock.tick(60) # 프레임 수
@@ -119,7 +121,7 @@ while running:
                         arrow_LEFT = False
                     Shoot = True
             elif event.key == pygame.K_q: # q키를 누름 : 스킬1
-                pass
+                Qskill = True
         
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
