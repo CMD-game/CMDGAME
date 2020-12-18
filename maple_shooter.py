@@ -34,6 +34,7 @@ clock = pygame.time.Clock()
 # 1. 사용자 게임 초기화 (배경 화면, 게임 이미지, 좌표, 속도, 폰트 등)
 
 background = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_background.png")
+stage = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_stage.png")
 
 character_RIGHT = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_character_RIGHT.png")
 character = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_character_LEFT.png")
@@ -155,10 +156,10 @@ while running:
         if character_Exp >= MAX_Exp:
             character_Exp -= MAX_Exp
             character_Level += 1
-            MAX_Exp += MAX_Exp * 0.1
+            MAX_Exp += MAX_Exp * 0.1 # MAX Exp, Hp, MP는 모두 1.1배 
             MAX_HP += MAX_HP * 0.1
             MAX_MP += MAX_MP * 0.1
-            character_HP = MAX_HP
+            character_HP = MAX_HP # 레벨업시 즉시 회복
             character_MP = MAX_MP
         enemy_slime_x_pos = -1000
         enemy_slime_regen_time = elapsed_time
@@ -194,9 +195,11 @@ while running:
     HP = game_font.render("HP : {} / {}".format(int(character_HP), int(MAX_HP)), True, (255, 0, 0))
     MP = game_font.render("MP : {} / {}".format(int(character_MP), int(MAX_MP)), True, (0, 0, 255))
     Exp = game_font.render("Exp : {} / {}".format(int(character_Exp), int(MAX_Exp)), True, (255, 255, 0))
+    Level = game_font.render("Lv.{}".format(int(character_Level)), True, (0, 255, 0))
 
     # 5. 화면에 그리기
-    screen.blit(background, (0, 0)) 
+    screen.blit(background, (0, 0))
+    screen.blit(stage, (0, (screen_height-50))) 
     if invincibility == True: # 무적 시간에 깜빡임 구현 (더 나은 방안이 있으면 수정 바람)
         if ((pygame.time.get_ticks() - start_ticks) / 1000 - invincibility_time) <= 0.25 or (((pygame.time.get_ticks() - start_ticks) / 1000 - invincibility_time) >= 0.5 and ((pygame.time.get_ticks() - start_ticks) / 1000 - invincibility_time) <= 0.75):
             pass
@@ -225,10 +228,10 @@ while running:
             screen.blit(arrow, (arrow_x_pos, arrow_y_pos))
         else:
             screen.blit(arrow_RIGHT, (arrow_x_pos, arrow_y_pos))
-    screen.blit(timer, (10, 10)) # 필수들
     screen.blit(HP, ((screen_width - 200), 10))
     screen.blit(MP, ((screen_width - 200), 40))
     screen.blit(Exp, ((screen_width - 500), 10))
+    screen.blit(Level, (10, 10))
     pygame.display.update() 
 
 pygame.quit()
