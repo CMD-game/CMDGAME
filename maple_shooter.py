@@ -42,6 +42,7 @@ stage_size = stage.get_rect().size
 stage_height = stage_size[1]
 portal = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_portal.png")
 Qskill_effect = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_Qskill_effect.png")
+Qskill_effect_x_pos = 50
 
 character_RIGHT = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_character_RIGHT.png")
 character = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_character_LEFT.png")
@@ -152,11 +153,12 @@ while running:
     if Qskill == True:
         ###
         ###
-        Qskill_delay = True
-        attack_delay = True
-        A_elapsed_time = pygame.time.get_ticks() - start_ticks
-        Q_elapsed_time = pygame.time.get_ticks() - start_ticks
-        Qskill = False
+        if Shoot == True:
+            Qskill_delay = True
+            attack_delay = True
+            A_elapsed_time = pygame.time.get_ticks() - start_ticks
+            Q_elapsed_time = pygame.time.get_ticks() - start_ticks
+            Qskill = False
         
     
     if attack_delay == True:
@@ -165,7 +167,7 @@ while running:
 
     if Qskill_delay == True:
         if pygame.time.get_ticks() - start_ticks - Q_elapsed_time >= Qskill_delay_time:
-            Qskill_delay == False
+            Qskill_delay = False
 
     character_x_pos += (character_to_x_LEFT + character_to_x_RIGHT) * dt # 캐릭터 이동
     if character_x_pos < 0:
@@ -264,6 +266,8 @@ while running:
             screen.blit(arrow, (arrow_x_pos, arrow_y_pos))
         else:
             screen.blit(arrow_RIGHT, (arrow_x_pos, arrow_y_pos))
+    if Qskill == True:
+        screen.blit(Qskill_effect, (Qskill_effect_x_pos, screen_height - stage_height))
     screen.blit(HP, ((screen_width - 200), 10))
     screen.blit(MP, ((screen_width - 200), 40))
     screen.blit(Exp, ((screen_width - 500), 10))
