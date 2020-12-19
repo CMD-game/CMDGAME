@@ -83,7 +83,7 @@ enemy_slime_width = enemy_slime_size[0]
 enemy_slime_height = enemy_slime_size[1]
 enemy_slime_x_pos = 0
 enemy_slime_y_pos = screen_height - enemy_slime_height - stage_height
-enemy_slime_regen = 0.5 # 실제 리젠 시간
+enemy_slime_regen = 500 # 실제 리젠 시간
 enemy_slime_regen_time = 0 # 리젠 시간을 재기 위한 변수(0으로 고정)
 
 enemy_slime_attack = 5
@@ -97,6 +97,8 @@ running = True
 Slime = True 
 Shoot = False
 Qskill = False
+Qskill_delay = False
+Qskill_delay_time = 5000
 invincibility = 0
 while running:
     dt = clock.tick(60) # 프레임 수
@@ -128,19 +130,15 @@ while running:
                         A_elapsed_time = pygame.time.get_ticks() - start_ticks
             elif event.key == pygame.K_q: # q키를 누름 : 스킬1
                 if attack_delay == False:
-                    Qskill = True
-                    attack_delay = True
-                    A_elapsed_time = pygame.time.get_ticks() - start_ticks
+                    if Qskill_delay == False:
+                        if Qskill == False:
+                            Qskill = True
         
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
                 character_to_x_LEFT = 0
             elif event.key == pygame.K_RIGHT:
                 character_to_x_RIGHT = 0
-    
-    if attack_delay == True:
-        if pygame.time.get_ticks() - A_elapsed_time >= attack_delay_time:
-            attack_delay = False
 
     if Shoot == True:
         if arrow_LEFT == True:
@@ -150,6 +148,24 @@ while running:
         arrow_y_pos += 1
     else:
         arrow_y_pos = -1000 # 화살을 제거 (더 나은 방안이 있으면 수정 바람)
+
+    if Qskill == True:
+        ###
+        ###
+        Qskill_delay = True
+        attack_delay = True
+        A_elapsed_time = pygame.time.get_ticks() - start_ticks
+        Q_elapsed_time = pygame.time.get_ticks() - start_ticks
+        Qskill = False
+        
+    
+    if attack_delay == True:
+        if pygame.time.get_ticks() - start_ticks - A_elapsed_time >= attack_delay_time:
+            attack_delay = False
+
+    if Qskill_delay == True:
+        if pygame.time.get_ticks() - start_ticks - Q_elapsed_time >= Qskill_delay_time:
+            Qskill_delay == False
 
     character_x_pos += (character_to_x_LEFT + character_to_x_RIGHT) * dt # 캐릭터 이동
     if character_x_pos < 0:
@@ -184,12 +200,12 @@ while running:
             character_HP = MAX_HP # 레벨업시 즉시 회복
             character_MP = MAX_MP
         enemy_slime_x_pos = -1000
-        enemy_slime_regen_time = elapsed_time
+        enemy_slime_regen_time = pygame.time.get_ticks() - start_ticks
     elif (arrow_x_pos < 0) or (arrow_x_pos > (screen_width - arrow_width)) or (arrow_y_pos > screen_height):
         Shoot = False
 
     if Slime == False:
-        if (pygame.time.get_ticks() - start_ticks) / 1000 - enemy_slime_regen_time >= enemy_slime_regen:
+        if (pygame.time.get_ticks() - start_ticks) - enemy_slime_regen_time >= enemy_slime_regen:
             Slime = True
 
     if Slime == True:
@@ -204,16 +220,14 @@ while running:
                 print("game over")
                 running = False
 
-    elapsed_time = (pygame.time.get_ticks() - start_ticks) / 1000
     if invincibility == 2:
-        invincibility_time = elapsed_time
+        invincibility_time = pygame.time.get_ticks() - start_ticks
         invincibility = 1
     if invincibility == 1:
-        if (pygame.time.get_ticks() - start_ticks) / 1000 - invincibility_time >= 1: # 1: 무적 시간(초)
+        if (pygame.time.get_ticks() - start_ticks) - invincibility_time >= 1000: # 1: 무적 시간(초)
             invincibility = 0
 
     # 게임 화면 표시
-    timer = game_font.render("Time : {}".format(int(elapsed_time)), True, (255, 255, 255))
     HP = game_font.render("HP : {} / {}".format(int(character_HP), int(MAX_HP)), True, (255, 0, 0))
     MP = game_font.render("MP : {} / {}".format(int(character_MP), int(MAX_MP)), True, (0, 0, 255))
     Exp = game_font.render("Exp : {} / {}".format(int(character_Exp), int(MAX_Exp)), True, (255, 255, 0))
@@ -223,7 +237,7 @@ while running:
     screen.blit(background, (0, 0))
     screen.blit(stage, (0, (screen_height - stage_height))) 
     if invincibility == True: # 무적 시간에 깜빡임 구현 (더 나은 방안이 있으면 수정 바람)
-        if ((pygame.time.get_ticks() - start_ticks) / 1000 - invincibility_time) <= 0.25 or (((pygame.time.get_ticks() - start_ticks) / 1000 - invincibility_time) >= 0.5 and ((pygame.time.get_ticks() - start_ticks) / 1000 - invincibility_time) <= 0.75):
+        if int((pygame.time.get_ticks() - start_ticks - invincibility_time) / 250) % 2 == 0:
             pass
         else:
             if (character_to_x_LEFT + character_to_x_RIGHT) > 0:
