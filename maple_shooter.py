@@ -47,8 +47,9 @@ stage_size = stage.get_rect().size
 stage_height = stage_size[1]
 
 portal = pygame.image.load(os.path.join(image_path, "M_portal.png"))
-portal = pygame.image.load(os.path.join(image_path, "M_portal.png"))
 Qskill_effect = pygame.image.load(os.path.join(image_path, "M_Qskill_effect.png"))
+Qskill_size = Qskill_effect.get_rect().size
+Qskill_width = Qskill_size[0]
 Qskill_effect_x_pos = 50
 Qskill_MP = 10
 
@@ -110,7 +111,8 @@ start_ticks = pygame.time.get_ticks()
 running = True
 Slime = True 
 Shoot = False
-Qskill = False
+Qskill_ready = False
+Qskill_damage = False
 Qskill_delay = False
 Qskill_delay_time = 5000
 invincibility = 0
@@ -142,10 +144,8 @@ while running:
                     attack_delay = True
                     A_elapsed_time = pygame.time.get_ticks() - start_ticks
             elif event.key == pygame.K_q: # q키를 누름 : 스킬1
-                if attack_delay == False:
-                    if Qskill_delay == False:
-                        if Qskill == False:
-                            Qskill = True
+                if attack_delay == False and Qskill_delay == False and Qskill_ready == False and Qskill_damage == False and character_MP >= Qskill_MP:
+                    Qskill_ready = True
         
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
@@ -153,18 +153,31 @@ while running:
             elif event.key == pygame.K_RIGHT:
                 character_to_x_RIGHT = 0
 
-    if Qskill == True:
+    if Qskill_ready == True:
         character_MP -= Qskill_MP
-        ###
-        ###
-        if Shoot == True:
-            Qskill_delay = True
-            attack_delay = True
-            A_elapsed_time = pygame.time.get_ticks() - start_ticks
+        if character_to_x_LEFT_press == 1:
+            Qskill_effect_x_pos = character_x_pos - 200 - character_width
+        else:
+            Qskill_effect_x_pos = character_x_pos + 200
+        if Qskill_effect_x_pos < 0:
+            Qskill_effect_x_pos = 0
+        if Qskill_effect_x_pos > screen_width - Qskill_width:
+            Qskill_effect_x_pos = screen_width - Qskill_width
+        attack_delay = True
+        A_elapsed_time = pygame.time.get_ticks() - start_ticks
+        Q_damage_elapsed_time = pygame.time.get_ticks() - start_ticks
+        Qskill_damage = True
+        Qskill_ready = False
+
+    if Qskill_damage == True:
+        if pygame.time.get_ticks() - start_ticks - Q_damage_elapsed_time >= 1000:
+            ### 데미지를 넣는 장치 필요
+            Qskill_damage = False
             Q_elapsed_time = pygame.time.get_ticks() - start_ticks
-            Qskill = False
-        
-    
+            Qskill_delay = True
+            pass
+
+
     if attack_delay == True:
         if pygame.time.get_ticks() - start_ticks - A_elapsed_time >= attack_delay_time:
             attack_delay = False
@@ -292,7 +305,7 @@ while running:
             screen.blit(arrow, (arrow_x_pos, arrow_y_pos))
         else:
             screen.blit(arrow_RIGHT, (arrow_x_pos, arrow_y_pos))
-    if Qskill == True:
+    if Qskill_damage == True:
         screen.blit(Qskill_effect, (Qskill_effect_x_pos, screen_height - stage_height))
     screen.blit(HP, ((screen_width - 200), 10))
     screen.blit(MP, ((screen_width - 200), 40))
