@@ -50,6 +50,7 @@ portal = pygame.image.load(os.path.join(image_path, "M_portal.png"))
 portal = pygame.image.load(os.path.join(image_path, "M_portal.png"))
 Qskill_effect = pygame.image.load(os.path.join(image_path, "M_Qskill_effect.png"))
 Qskill_effect_x_pos = 50
+Qskill_MP = 10
 
 character_RIGHT = pygame.image.load(os.path.join(image_path, "M_character_RIGHT.png"))
 character = pygame.image.load(os.path.join(image_path, "M_character_LEFT.png"))
@@ -71,8 +72,8 @@ invincibility = 0
 attack_delay = False
 attack_delay_time = 1000 #ms
 
-character_to_x_LEFT = 0 
-character_to_x_LEFT_press = 0 # 왼쪽을 보고 있는지 확인하기 위한 변수
+character_to_x_LEFT = 0
+character_to_x_LEFT_press = 1 # 왼쪽을 보고 있는지 확인하기 위한 변수
 character_to_x_RIGHT = 0
 character_to_x_RIGHT_press = 0
 arrow = pygame.image.load(os.path.join(image_path, "M_arrow_LEFT.png"))
@@ -153,6 +154,7 @@ while running:
                 character_to_x_RIGHT = 0
 
     if Qskill == True:
+        character_MP -= Qskill_MP
         ###
         ###
         if Shoot == True:
