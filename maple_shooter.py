@@ -73,10 +73,14 @@ arrow_RIGHT = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M
 arrow_size = character.get_rect().size
 arrow_width = character_size[0]
 arrow_height = character_size[1]
-arrow_x_pos = character_x_pos
-arrow_y_pos = character_y_pos + 50
-arrow_LEFT = True 
+arrow_LEFT = 1
+
+arrow_speed_y = -15
+
+arrows = []
+
 arrow_speed = 0.6
+arrow_to_remove = -1
 
 enemy_slime = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_enemy_slime.png")
 enemy_slime_size = enemy_slime.get_rect().size
@@ -84,6 +88,7 @@ enemy_slime_width = enemy_slime_size[0]
 enemy_slime_height = enemy_slime_size[1]
 enemy_slime_x_pos = 0
 enemy_slime_y_pos = screen_height - enemy_slime_height - stage_height
+enemy_slime_Exp = 10
 enemy_slime_regen = 500 # 실제 리젠 시간
 enemy_slime_regen_time = 0 # 리젠 시간을 재기 위한 변수(0으로 고정)
 
@@ -119,16 +124,15 @@ while running:
                 character_to_x_RIGHT_press = 1
             elif event.key == pygame.K_a: # a키를 누름 : 공격
                 if attack_delay == False:
-                    if Shoot == False:
-                        arrow_x_pos = character_x_pos
-                        arrow_y_pos = character_y_pos + 50
-                        if character_to_x_LEFT_press == 1:
-                            arrow_LEFT = True
-                        else:
-                            arrow_LEFT = False
-                        Shoot = True
-                        attack_delay = True
-                        A_elapsed_time = pygame.time.get_ticks() - start_ticks
+                    arrow_x_pos = character_x_pos + (character_width - arrow_width) / 2
+                    arrow_y_pos = character_y_pos + 50
+                    if character_to_x_LEFT_press == 1:
+                        arrow_LEFT = 1
+                    else:
+                        arrow_LEFT = 0
+                    arrows.append([arrow_x_pos, arrow_y_pos, arrow_LEFT])
+                    attack_delay = True
+                    A_elapsed_time = pygame.time.get_ticks() - start_ticks
             elif event.key == pygame.K_q: # q키를 누름 : 스킬1
                 if attack_delay == False:
                     if Qskill_delay == False:
@@ -140,15 +144,6 @@ while running:
                 character_to_x_LEFT = 0
             elif event.key == pygame.K_RIGHT:
                 character_to_x_RIGHT = 0
-
-    if Shoot == True:
-        if arrow_LEFT == True:
-            arrow_x_pos -= arrow_speed * dt
-        else:
-            arrow_x_pos += arrow_speed * dt
-        arrow_y_pos += 1
-    else:
-        arrow_y_pos = -1000 # 화살을 제거 (더 나은 방안이 있으면 수정 바람)
 
     if Qskill == True:
         ###
@@ -174,6 +169,17 @@ while running:
         character_x_pos = 0
     if character_x_pos > screen_width - character_width:
         character_x_pos = screen_width - character_width
+    
+    # 화살 위치 조정
+    for w in arrows:
+        if w[2] == 1:
+            arrows = [ [w[0] - arrow_speed, w[1], w[2]]]
+        else:
+            arrows = [ [w[0] + arrow_speed, w[1], w[2]]]
+    
+
+    # 바닥 또는 벽에 닿은 화살 없애기
+    arrows = [ [w[0], w[1], w[2]] for w in arrows if (w[0] < 0) or (w[0] > screen_width - arrow_width) or (w[1] < screen_height - stage_height)]
    
     # 4. 충돌 처리 
     # 필수 (캐릭터 크기를 재는 함수들)
@@ -185,26 +191,37 @@ while running:
     enemy_slime_rect.left = enemy_slime_x_pos
     enemy_slime_rect.top = enemy_slime_y_pos
     
-    arrow_rect = arrow.get_rect()
-    arrow_rect.left = arrow_x_pos
-    arrow_rect.top = arrow_y_pos
+    for arrow_idx, arrow_val in enumerate(arrows):
+        arrow_pos_x = arrow_val[0]
+        arrow_pos_y = arrow_val[1]
 
-    if arrow_rect.colliderect(enemy_slime_rect): # 화살과 슬라임이 충돌
-        Slime = False
-        Shoot = False
-        character_Exp += 10
-        if character_Exp >= MAX_Exp:
-            character_Exp -= MAX_Exp
-            character_Level += 1
-            MAX_Exp += MAX_Exp * 0.1 # MAX Exp, Hp, MP는 모두 1.1배 
-            MAX_HP += MAX_HP * 0.1
-            MAX_MP += MAX_MP * 0.1
-            character_HP = MAX_HP # 레벨업시 즉시 회복
-            character_MP = MAX_MP
-        enemy_slime_x_pos = -1000
-        enemy_slime_regen_time = pygame.time.get_ticks() - start_ticks
-    elif (arrow_x_pos < 0) or (arrow_x_pos > (screen_width - arrow_width)) or (arrow_y_pos > screen_height):
-        Shoot = False
+        arrow_rect = arrow.get_rect()
+        arrow_rect.left = arrow_pos_x
+        arrow_rect.right = arrow_pos_y
+
+        if arrow_rect.colliderect(enemy_slime_rect): # 화살과 슬라임이 충돌
+            arrow_to_remove = arrow_idx
+            character_Exp += enemy_slime_Exp
+            enemy_slime_x_pos = -1000
+            enemy_slime_regen_time = pygame.time.get_ticks() - start_ticks
+            Slime = False
+            break
+        elif (arrow_x_pos < 0) or (arrow_x_pos > (screen_width - arrow_width)) or (arrow_y_pos > screen_height):
+            arrow_to_remove = arrow_idx
+            break
+
+    if arrow_to_remove > -1:
+        del arrows[arrow_to_remove]
+        arrow_to_remove = -1
+
+    if character_Exp >= MAX_Exp:
+        character_Exp -= MAX_Exp
+        character_Level += 1
+        MAX_Exp += MAX_Exp * 0.1 # MAX Exp, Hp, MP는 모두 1.1배 
+        MAX_HP += MAX_HP * 0.1
+        MAX_MP += MAX_MP * 0.1
+        character_HP = MAX_HP # 레벨업시 즉시 회복
+        character_MP = MAX_MP
 
     if Slime == False:
         if (pygame.time.get_ticks() - start_ticks) - enemy_slime_regen_time >= enemy_slime_regen:
@@ -261,8 +278,8 @@ while running:
             screen.blit(character_RIGHT, (character_x_pos, character_y_pos))
     if Slime == True:
         screen.blit(enemy_slime, (enemy_slime_x_pos, enemy_slime_y_pos))
-    if Shoot == True:
-        if arrow_LEFT == True:
+    for arrow_x_pos, arrow_y_pos, arrow_LEFT in arrows:
+        if arrow_LEFT == 1:
             screen.blit(arrow, (arrow_x_pos, arrow_y_pos))
         else:
             screen.blit(arrow_RIGHT, (arrow_x_pos, arrow_y_pos))
