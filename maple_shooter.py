@@ -1,4 +1,3 @@
-###천지성 출석 체크합니다.
 
 # 게임 조건
 # 0. 더 좋은 조건이 있다면 추가나 수정 바람
@@ -17,9 +16,11 @@
 
 import pygame
 import time
+import os #파일위치 반환을 위한 라이브러리
 #################################################################################################
 # 기본 초기화 (반드시 해야 하는 것들)
 pygame.init()
+
 
 # 화면 크기 설정
 screen_width = 640 # 가로 크기
@@ -29,20 +30,24 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 # 화면 타이틀 설정
 pygame.display.set_caption("Maple_shooter")
 
-# FPS
+# FPS(초당 프레임)
 clock = pygame.time.Clock()
 #################################################################################################
 
 # 1. 사용자 게임 초기화 (배경 화면, 게임 이미지, 좌표, 속도, 폰트 등)
 
-background = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_background.png")
-stage = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_stage.png")
+current_path = os.path.dirname(__file__) #현재 파일의 위치 반환
+image_path = os.path.join(current_path, "images") #images 폴더 위치 반환
+
+
+background = pygame.image.load(os.path.join(image_path, "M_background.png"))
+stage = pygame.image.load(os.path.join(image_path, "M_stage.png"))
 stage_size = stage.get_rect().size
 stage_height = stage_size[1]
-portal = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_portal.png")
+portal = pygame.image.load(os.path.join(image_path, "M_portal.png"))
 
-character_RIGHT = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_character_RIGHT.png")
-character = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_character_LEFT.png")
+character_RIGHT = pygame.image.load(os.path.join(image_path, "M_character_RIGHT.png"))
+character = pygame.image.load(os.path.join(image_path, "M_character_LEFT.png"))
 character_size = character.get_rect().size
 character_width = character_size[0]
 character_height = character_size[1]
@@ -63,8 +68,8 @@ character_to_x_LEFT = 0
 character_to_x_LEFT_press = 0 # 왼쪽을 보고 있는지 확인하기 위한 변수
 character_to_x_RIGHT = 0
 character_to_x_RIGHT_press = 0
-arrow = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_arrow_LEFT.png")
-arrow_RIGHT = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_arrow_RIGHT.png")
+arrow = pygame.image.load(os.path.join(image_path, "M_arrow_LEFT.png"))
+arrow_RIGHT = pygame.image.load(os.path.join(image_path, "M_arrow_RIGHT.png"))
 arrow_size = character.get_rect().size
 arrow_width = character_size[0]
 arrow_height = character_size[1]
@@ -73,7 +78,7 @@ arrow_y_pos = character_y_pos + 50
 arrow_LEFT = True 
 arrow_speed = 0.6
 
-enemy_slime = pygame.image.load("C:/Users/user/Desktop/PythonWorkSpace/CMDGAME/M_enemy_slime.png")
+enemy_slime = pygame.image.load(os.path.join(image_path, "M_enemy_slime.png"))
 enemy_slime_size = enemy_slime.get_rect().size
 enemy_slime_width = enemy_slime_size[0]
 enemy_slime_height = enemy_slime_size[1]
