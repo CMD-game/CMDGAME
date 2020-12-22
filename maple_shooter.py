@@ -48,7 +48,7 @@ stage_height = stage_size[1]
 
 portal = pygame.image.load(os.path.join(image_path, "M_portal.png"))
 portal = pygame.image.load(os.path.join(image_path, "M_portal.png"))
-Qskill_effect = pygame.image.load(os.path.join(image_path, "M_Qskill_effect.png"))ㅋ
+Qskill_effect = pygame.image.load(os.path.join(image_path, "M_Qskill_effect.png"))
 Qskill_effect_x_pos = 50
 
 character_RIGHT = pygame.image.load(os.path.join(image_path, "M_character_RIGHT.png"))
