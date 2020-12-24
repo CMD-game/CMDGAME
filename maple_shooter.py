@@ -48,9 +48,12 @@ stage_height = stage_size[1]
 
 portal = pygame.image.load(os.path.join(image_path, "M_portal.png"))
 Qskill_effect = pygame.image.load(os.path.join(image_path, "M_Qskill_effect.png"))
+Qskill_arrow = pygame.image.load(os.path.join(image_path, "M_Qskill_arrow.png"))
 Qskill_size = Qskill_effect.get_rect().size
 Qskill_width = Qskill_size[0]
 Qskill_effect_x_pos = 50
+Qskill_arrow_x_pos = 50
+Qskill_arrow_y_pos = 0
 Qskill_MP = 10
 
 character_RIGHT = pygame.image.load(os.path.join(image_path, "M_character_RIGHT.png"))
@@ -112,6 +115,7 @@ running = True
 Slime = True 
 Shoot = False
 Qskill_ready = False
+Qskill_input = False
 Qskill_damage = False
 Qskill_delay = False
 Qskill_delay_time = 5000
@@ -144,8 +148,8 @@ while running:
                     attack_delay = True
                     A_elapsed_time = pygame.time.get_ticks() - start_ticks
             elif event.key == pygame.K_q: # q키를 누름 : 스킬1
-                if attack_delay == False and Qskill_delay == False and Qskill_ready == False and Qskill_damage == False and character_MP >= Qskill_MP:
-                    Qskill_ready = True
+                if attack_delay == False and Qskill_delay == False and Qskill_ready == False and Qskill_input == False and Qskill_damage == False and character_MP >= Qskill_MP:
+                    Qskill_input = True
         
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
@@ -153,7 +157,7 @@ while running:
             elif event.key == pygame.K_RIGHT:
                 character_to_x_RIGHT = 0
 
-    if Qskill_ready == True:
+    if Qskill_input == True:
         character_MP -= Qskill_MP
         if character_to_x_LEFT_press == 1:
             Qskill_effect_x_pos = character_x_pos - 200 - character_width
@@ -166,18 +170,21 @@ while running:
         attack_delay = True
         A_elapsed_time = pygame.time.get_ticks() - start_ticks
         Q_damage_elapsed_time = pygame.time.get_ticks() - start_ticks
-        Qskill_damage = True
-        Qskill_ready = False
+        Qskill_ready = True
+        Qskill_input = False
+
+    if Qskill_ready == True:
+        Qskill_arrow_x_pos = Qskill_effect_x_pos
+        Qskill_arrow_y_pos = 0
+        Q_elapsed_time = pygame.time.get_ticks() - start_ticks
+        Qskill_delay = True
+        if pygame.time.get_ticks() - start_ticks - Q_damage_elapsed_time >= 1000:
+            Qskill_damage = True
+            Qskill_ready = False
 
     if Qskill_damage == True:
-        if pygame.time.get_ticks() - start_ticks - Q_damage_elapsed_time >= 1000:
-            ### 데미지를 넣는 장치 필요
-            Qskill_damage = False
-            Q_elapsed_time = pygame.time.get_ticks() - start_ticks
-            Qskill_delay = True
-            pass
-
-
+        Qskill_arrow_y_pos += 20
+        
     if attack_delay == True:
         if pygame.time.get_ticks() - start_ticks - A_elapsed_time >= attack_delay_time:
             attack_delay = False
@@ -212,6 +219,10 @@ while running:
     enemy_slime_rect = enemy_slime.get_rect()
     enemy_slime_rect.left = enemy_slime_x_pos
     enemy_slime_rect.top = enemy_slime_y_pos
+
+    Qskill_arrow_rect = Qskill_arrow.get_rect()
+    Qskill_arrow_rect.left = Qskill_arrow_x_pos
+    Qskill_arrow_rect.top = Qskill_arrow_y_pos
     
     for arrow_idx, arrow_val in enumerate(arrows):
         arrow_pos_x = arrow_val[0]
@@ -235,6 +246,9 @@ while running:
     if arrow_to_remove > -1:
         del arrows[arrow_to_remove]
         arrow_to_remove = -1
+    
+    if Qskill_arrow_rect.colliderect(enemy_slime_rect):
+        Slime = False
 
     if character_Exp >= MAX_Exp:
         character_Exp -= MAX_Exp
@@ -305,8 +319,10 @@ while running:
             screen.blit(arrow, (arrow_x_pos, arrow_y_pos))
         else:
             screen.blit(arrow_RIGHT, (arrow_x_pos, arrow_y_pos))
-    if Qskill_damage == True:
+    if Qskill_ready == True:
         screen.blit(Qskill_effect, (Qskill_effect_x_pos, screen_height - stage_height))
+    if Qskill_damage == True:
+        screen.blit(Qskill_arrow, (Qskill_arrow_x_pos, Qskill_arrow_y_pos))
     screen.blit(HP, ((screen_width - 200), 10))
     screen.blit(MP, ((screen_width - 200), 40))
     screen.blit(Exp, ((screen_width - 500), 10))
