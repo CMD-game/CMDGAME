@@ -101,7 +101,7 @@ enemy_slime_height = enemy_slime_size[1]
 enemy_slime_x_pos = 0
 enemy_slime_y_pos = screen_height - enemy_slime_height - stage_height
 enemy_slime_Exp = 10
-enemy_slime_regen = 500 # 실제 리젠 시간
+enemy_slime_regen = 1000 # 실제 리젠 시간
 enemy_slime_regen_time = 0 # 리젠 시간을 재기 위한 변수(0으로 고정)
 
 enemy_slime_attack = 5
@@ -197,7 +197,7 @@ while running:
             Qskill_ready = False
 
     if Qskill_damage == True:
-        Qskill_arrow_y_pos += 20
+        Qskill_arrow_y_pos += 15
         
     if attack_delay == True:
         if pygame.time.get_ticks() - start_ticks - A_elapsed_time >= attack_delay_time:
@@ -249,7 +249,6 @@ while running:
         if arrow_rect.colliderect(enemy_slime_rect): # 화살과 슬라임이 충돌
             arrow_to_remove = arrow_idx
             character_Exp += enemy_slime_Exp
-            enemy_slime_x_pos = -1000
             enemy_slime_regen_time = pygame.time.get_ticks() - start_ticks
             Slime = False
             break
@@ -263,6 +262,11 @@ while running:
     
     if Qskill_arrow_rect.colliderect(enemy_slime_rect):
         Slime = False
+        enemy_slime_regen_time = pygame.time.get_ticks() - start_ticks
+        character_Exp += enemy_slime_Exp
+
+    if Qskill_arrow_y_pos >= screen_height:
+        Qskill_damage = False
 
     if character_Exp >= MAX_Exp:
         character_Exp -= MAX_Exp
@@ -274,6 +278,7 @@ while running:
         character_MP = MAX_MP
 
     if Slime == False:
+        enemy_slime_x_pos = -1000
         if (pygame.time.get_ticks() - start_ticks) - enemy_slime_regen_time >= enemy_slime_regen:
             Slime = True
 
