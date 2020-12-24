@@ -91,7 +91,7 @@ arrow_speed_y = -15
 
 arrows = []
 
-arrow_speed = 0.6
+arrow_speed = 5
 arrow_to_remove = -1
 
 enemy_slime = pygame.image.load(os.path.join(image_path, "M_enemy_slime.png"))
@@ -118,7 +118,11 @@ Qskill_ready = False
 Qskill_input = False
 Qskill_damage = False
 Qskill_delay = False
-Qskill_delay_time = 5000
+Qskill_delay_time = 50
+airborne = False
+jump_height = -10
+jump_speed = 0.5
+airborne_distance = jump_height
 invincibility = 0
 while running:
     dt = clock.tick(60) # 프레임 수
@@ -136,6 +140,9 @@ while running:
                 character_to_x_RIGHT += character_speed
                 character_to_x_LEFT_press = 0
                 character_to_x_RIGHT_press = 1
+            elif event.key == pygame.K_UP:
+                if airborne == False:
+                    airborne = True
             elif event.key == pygame.K_a: # a키를 누름 : 공격
                 if attack_delay == False:
                     arrow_x_pos = character_x_pos + (character_width - arrow_width) / 2
@@ -156,6 +163,13 @@ while running:
                 character_to_x_LEFT = 0
             elif event.key == pygame.K_RIGHT:
                 character_to_x_RIGHT = 0
+
+    if airborne == True:
+        character_y_pos += airborne_distance
+        airborne_distance += jump_speed
+        if character_y_pos == screen_height - stage_height - character_height:
+            airborne = False
+            airborne_distance = jump_height
 
     if Qskill_input == True:
         character_MP -= Qskill_MP
