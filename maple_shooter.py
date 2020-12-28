@@ -1,13 +1,14 @@
 
 # 게임 조건
 # 0. 더 좋은 조건이 있다면 추가나 수정 바람
-# 1. 캐릭터 : 좌우로 움직이거나 점프할 수 있고 활을 쏨
-# 2. 적은 한쪽 벽면에 고정되어 있으며, 몬스터가 생성하는 장애물을 피해서 맞춰야 함
-# 3. 화살에 몬스터가 맞으면 몬스터의 체력이 줄어들고 몬스터의 체력이 0이되면 몬스터가 죽음
-# 4. 몬스터를 처치하면 레벨 업 - 레벨 업 시 HP, MP 완전 회복 및 다음레벨의 몬스터 소환
+# 1. 캐릭터 : 좌우로 움직일 수 있고 활을 쏨
+# 2. 적은 양쪽에서 다가오고, 방향을 조절하여 맞춰야 함
+# 3. 화살에 적이 맞으면 적이 죽음과 동시에 경험치가 오름
+# 4. 경험치가 일정량 이상 모이면 레벨 업 - 레벨 업 시 HP, MP 완전 회복
 # 5. 일정 레벨 이상이면 더 강력한 스킬 사용 가능
-# 6. 장애물에 닿으면 HP 1 감소, HP가 0이 되면 게임 오버
-# 7. 평타에는 쿨타임(장전 시간)이 있고 평타가 쿨타임일때 스킬 사용 불가, 모든 스킬에는 각자의 쿨타임이 따로 존재함
+# 6. 적에게 닿으면 HP 감소, HP가 0이 되면 게임 오버
+# 7. 적을 죽이면 일정 확률로 인벤토리에 HP, MP 물약이 들어옴
+# 8. 모든 평타와 스킬에는 공통적인 쿨타임(장전 시간)이 있고, 스킬에는 각자의 쿨타임이 따로 존재한다.
 
 # 게임 이미지
 # 배경 : 640 * 480 (가로 세로) - M_background.png
@@ -61,13 +62,6 @@ character_width = character_size[0]
 character_height = character_size[1]
 character_x_pos = (screen_width - character_width)/ 2
 character_y_pos = screen_height - character_height - stage_height
-
-platform = pygame.image.load(os.path.join(image_path, "M_platform.png"))
-platform_size = platform.get_rect().size
-platform_width = platform_size[0]
-platform_height = platform_size[1]
-platform_x_pos = (screen_width - platform_width)/ 2
-platform_y_pos = screen_height - platform_height - stage_height -70
 
 character_speed = 0.3
 character_HP = 100
@@ -173,12 +167,6 @@ while running:
         character_y_pos += airborne_distance
         airborne_distance += jump_speed
         if character_y_pos == screen_height - stage_height - character_height:
-            airborne = False
-            airborne_distance = jump_height
-
-    if airborne_distance > 0:
-        pass
-        if character_y_pos == screen_height - platform_y_pos:
             airborne = False
             airborne_distance = jump_height
 
@@ -320,8 +308,7 @@ while running:
 
     # 5. 화면에 그리기
     screen.blit(background, (0, 0))
-    screen.blit(stage, (0, (screen_height - stage_height)))
-    screen.blit(platform, (platform_x_pos, platform_y_pos))
+    screen.blit(stage, (0, (screen_height - stage_height))) 
     if invincibility == True: # 무적 시간에 깜빡임 구현 (더 나은 방안이 있으면 수정 바람)
         if int((pygame.time.get_ticks() - start_ticks - invincibility_time) / 250) % 2 == 0:
             pass
