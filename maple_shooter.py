@@ -45,7 +45,6 @@ stage = pygame.image.load(os.path.join(image_path, "M_stage.png"))
 stage_size = stage.get_rect().size
 stage_height = stage_size[1]
 
-portal = pygame.image.load(os.path.join(image_path, "M_portal.png"))
 Qskill_effect = pygame.image.load(os.path.join(image_path, "M_Qskill_effect.png"))
 Qskill_arrow = pygame.image.load(os.path.join(image_path, "M_Qskill_arrow.png"))
 Qskill_size = Qskill_effect.get_rect().size
@@ -97,7 +96,7 @@ arrow_speed_y = -15
 
 arrows = []
 
-arrow_speed = 5
+arrow_speed = 10
 arrow_to_remove = -1
 
 enemy_slime = pygame.image.load(os.path.join(image_path, "M_enemy_slime.png"))
@@ -359,7 +358,6 @@ while running:
     screen.blit(MP, ((screen_width - 200), 40))
     screen.blit(Exp, ((screen_width - 500), 10))
     screen.blit(Level, (10, 10))
-    screen.blit(portal, ((screen_width - 60), screen_height - stage_height - 60))
     pygame.display.update() 
 
 pygame.quit()
