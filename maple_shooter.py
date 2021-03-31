@@ -53,7 +53,7 @@ Qskill_width = Qskill_size[0]
 Qskill_effect_x_pos = 50
 Qskill_arrow_x_pos = 50
 Qskill_arrow_y_pos = 0
-Qskill_MP = 10
+
 
 character_RIGHT = pygame.image.load(os.path.join(image_path, "M_character_RIGHT.png"))
 character = pygame.image.load(os.path.join(image_path, "M_character_LEFT.png"))
@@ -65,12 +65,10 @@ character_y_pos = screen_height - character_height - stage_height
 
 character_speed = 0.3
 character_HP = 100
-character_MP = 100
 character_Exp = 0
 character_Level = 1
 MAX_Exp = 100
 MAX_HP = 100
-MAX_MP = 100
 invincibility = 0
 attack_delay = False
 attack_delay_time = 1000 #ms
@@ -154,7 +152,7 @@ while running:
                     attack_delay = True
                     A_elapsed_time = pygame.time.get_ticks() - start_ticks
             elif event.key == pygame.K_q: # q키를 누름 : 스킬1
-                if attack_delay == False and Qskill_delay == False and Qskill_ready == False and Qskill_input == False and Qskill_damage == False and character_MP >= Qskill_MP:
+                if attack_delay == False and Qskill_delay == False and Qskill_ready == False and Qskill_input == False and Qskill_damage == False:
                     Qskill_input = True
         
         if event.type == pygame.KEYUP:
@@ -171,7 +169,6 @@ while running:
             airborne_distance = jump_height
 
     if Qskill_input == True:
-        character_MP -= Qskill_MP
         if character_to_x_LEFT_press == 1:
             Qskill_effect_x_pos = character_x_pos - 200 - character_width
         else:
@@ -270,11 +267,9 @@ while running:
     if character_Exp >= MAX_Exp:
         character_Exp -= MAX_Exp
         character_Level += 1
-        MAX_Exp += MAX_Exp * 0.1 # MAX Exp, Hp, MP는 모두 1.1배 
+        MAX_Exp += MAX_Exp * 0.1 # MAX Exp, Hp 는 모두 1.1배 
         MAX_HP += MAX_HP * 0.1
-        MAX_MP += MAX_MP * 0.1
         character_HP = MAX_HP # 레벨업시 즉시 회복
-        character_MP = MAX_MP
 
     if Slime == False:
         enemy_slime_x_pos = -1000
@@ -302,7 +297,6 @@ while running:
 
     # 게임 화면 표시
     HP = game_font.render("HP : {} / {}".format(int(character_HP), int(MAX_HP)), True, (255, 0, 0))
-    MP = game_font.render("MP : {} / {}".format(int(character_MP), int(MAX_MP)), True, (0, 0, 255))
     Exp = game_font.render("Exp : {} / {}".format(int(character_Exp), int(MAX_Exp)), True, (255, 255, 0))
     Level = game_font.render("Lv.{}".format(int(character_Level)), True, (0, 255, 0))
 
@@ -342,7 +336,6 @@ while running:
     if Qskill_damage == True:
         screen.blit(Qskill_arrow, (Qskill_arrow_x_pos, Qskill_arrow_y_pos))
     screen.blit(HP, ((screen_width - 200), 10))
-    screen.blit(MP, ((screen_width - 200), 40))
     screen.blit(Exp, ((screen_width - 500), 10))
     screen.blit(Level, (10, 10))
     pygame.display.update() 
