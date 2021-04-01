@@ -29,7 +29,7 @@ screen_height = 480 # 세로 크기
 screen = pygame.display.set_mode((screen_width, screen_height))
 
 # 화면 타이틀 설정
-pygame.display.set_caption("Maple_shooter")
+pygame.display.set_caption("boss_killer")
 
 # FPS(초당 프레임)
 clock = pygame.time.Clock()
@@ -40,11 +40,14 @@ clock = pygame.time.Clock()
 current_path = os.path.dirname(__file__) #현재 파일의 위치 반환
 image_path = os.path.join(current_path, "images") #images 폴더 위치 반환
 
-
 background = pygame.image.load(os.path.join(image_path, "M_background.png"))
 stage = pygame.image.load(os.path.join(image_path, "M_stage.png"))
 stage_size = stage.get_rect().size
 stage_height = stage_size[1]
+
+platform = pygame.image.load(os.path.join(image_path, "M_platform.png"))
+platform_x_pos = 300
+platform_y_pos = screen_height - 150
 
 Qskill_effect = pygame.image.load(os.path.join(image_path, "M_Qskill_effect.png"))
 Qskill_arrow = pygame.image.load(os.path.join(image_path, "M_Qskill_arrow.png"))
@@ -161,11 +164,12 @@ while running:
             elif event.key == pygame.K_RIGHT:
                 character_to_x_RIGHT = 0
 
-    if airborne == True:
+    if airborne == True: # 점프
         character_y_pos += airborne_distance
         airborne_distance += jump_speed
-        if character_y_pos == screen_height - stage_height - character_height:
+        if character_y_pos >= screen_height - stage_height - character_height:
             airborne = False
+            character_y_pos = screen_height - stage_height - character_height
             airborne_distance = jump_height
 
     if Qskill_input == True:
@@ -233,6 +237,10 @@ while running:
     Qskill_arrow_rect = Qskill_arrow.get_rect()
     Qskill_arrow_rect.left = Qskill_arrow_x_pos
     Qskill_arrow_rect.top = Qskill_arrow_y_pos
+
+    platform_rect = platform.get_rect()
+    platform_rect.left = platform_x_pos
+    platform_rect.top = platform_y_pos
     
     for arrow_idx, arrow_val in enumerate(arrows):
         arrow_pos_x = arrow_val[0]
@@ -256,6 +264,17 @@ while running:
         del arrows[arrow_to_remove]
         arrow_to_remove = -1
     
+    if character_rect.colliderect(platform_rect): # 플랫폼 착지
+        if (character_y_pos + character_height - 20) <= platform_y_pos and airborne_distance >= 0:
+            airborne = False
+            airborne_distance = jump_height
+            character_y_pos = platform_y_pos - character_height + 5
+    else:
+        if character_y_pos + character_height < screen_height - stage_height:
+            if airborne == False:
+                airborne_distance = 0
+                airborne = True
+
     if Qskill_arrow_rect.colliderect(enemy_slime_rect):
         Slime = False
         enemy_slime_regen_time = pygame.time.get_ticks() - start_ticks
@@ -303,6 +322,7 @@ while running:
     # 5. 화면에 그리기
     screen.blit(background, (0, 0))
     screen.blit(stage, (0, (screen_height - stage_height))) 
+    screen.blit(platform, (platform_x_pos, platform_y_pos))
     if invincibility == True: # 무적 시간에 깜빡임 구현 (더 나은 방안이 있으면 수정 바람)
         if int((pygame.time.get_ticks() - start_ticks - invincibility_time) / 250) % 2 == 0:
             pass
