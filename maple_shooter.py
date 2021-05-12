@@ -49,12 +49,12 @@ platform_x_pos = 300
 platform_y_pos = screen_height - 150
 
 Qskill_effect = pygame.image.load(os.path.join(image_path, "M_Qskill_effect.png"))
-Qskill_arrow = pygame.image.load(os.path.join(image_path, "M_Qskill_arrow.png"))
+Qskill_bullet = pygame.image.load(os.path.join(image_path, "M_Qskill_bullet.png"))
 Qskill_size = Qskill_effect.get_rect().size
 Qskill_width = Qskill_size[0]
 Qskill_effect_x_pos = 50
-Qskill_arrow_x_pos = 50
-Qskill_arrow_y_pos = 0
+Qskill_bullet_x_pos = 50
+Qskill_bullet_y_pos = 0
 
 
 character_Bowmaster_RIGHT = pygame.image.load(os.path.join(image_path, "M_character_Bowmaster_RIGHT.png"))
@@ -72,28 +72,24 @@ character_Bowmaster_Level = 1
 MAX_Exp = 100
 MAX_HP = 100
 invincibility = 0
-attack_delay = False
-attack_delay_time = 1000 #ms
 
 character_Bowmaster_to_x_LEFT = 0
 character_Bowmaster_to_x_LEFT_press = 1 # 왼쪽을 보고 있는지 확인하기 위한 변수
 character_Bowmaster_to_x_RIGHT = 0
 character_Bowmaster_to_x_RIGHT_press = 0
 bullet_1 = pygame.image.load(os.path.join(image_path, "bullet_1.png"))
+bullet_1_using = False
 bullet_2 = pygame.image.load(os.path.join(image_path, "bullet_2.png"))
 bullet_3 = pygame.image.load(os.path.join(image_path, "bullet_3.png"))
 bullet_4 = pygame.image.load(os.path.join(image_path, "bullet_4.png"))
-arrow_size = character_Bowmaster.get_rect().size
-arrow_width = character_Bowmaster_size[0]
-arrow_height = character_Bowmaster_size[1]
-arrow_LEFT = 1
+bullet_size = bullet_1.get_rect().size
+bullet_width = bullet_size[0]
+bullet_height = bullet_size[1]
+bullet_speed = 10
+bullet_LEFT = 1
+bullet_to_remove = -1
 
-arrow_speed_y = -15
-
-arrows = []
-
-arrow_speed = 10
-arrow_to_remove = -1
+bullets = []
 
 enemy_slime = pygame.image.load(os.path.join(image_path, "M_enemy_slime.png"))
 enemy_slime_size = enemy_slime.get_rect().size
@@ -153,16 +149,16 @@ while running:
                 airborne = True
                 airborne_distance = 5
             elif event.key == pygame.K_a: # a키를 누름 : 공격
-                if attack_delay == False:
-                    arrow_x_pos = character_Bowmaster_x_pos + (character_Bowmaster_width - arrow_width) / 2
-                    arrow_y_pos = character_Bowmaster_y_pos + 50
+                if bullet_1_using == False:
+                    bullet_1_using = True
+                    bullet_number = 1
+                    bullet_x_pos = character_Bowmaster_x_pos + (character_Bowmaster_width - bullet_width) / 2
+                    bullet_y_pos = character_Bowmaster_y_pos + 25
                     if character_Bowmaster_to_x_LEFT_press == 1:
-                        arrow_LEFT = 1
+                        bullet_LEFT = 1
                     else:
-                        arrow_LEFT = 0
-                    arrows.append([arrow_x_pos, arrow_y_pos, arrow_LEFT])
-                    attack_delay = True
-                    A_elapsed_time = pygame.time.get_ticks() - start_ticks
+                        bullet_LEFT = 0
+                    bullets.append([bullet_x_pos, bullet_y_pos, bullet_LEFT, bullet_number])
             elif event.key == pygame.K_q: # q키를 누름 : 스킬1
                 if attack_delay == False and Qskill_delay == False and Qskill_ready == False and Qskill_input == False and Qskill_damage == False:
                     Qskill_input = True
@@ -200,8 +196,8 @@ while running:
         Qskill_input = False
 
     if Qskill_ready == True:
-        Qskill_arrow_x_pos = Qskill_effect_x_pos
-        Qskill_arrow_y_pos = 0
+        Qskill_bullet_x_pos = Qskill_effect_x_pos
+        Qskill_bullet_y_pos = 0
         Q_elapsed_time = pygame.time.get_ticks() - start_ticks
         Qskill_delay = True
         if pygame.time.get_ticks() - start_ticks - Q_damage_elapsed_time >= 1000:
@@ -209,11 +205,7 @@ while running:
             Qskill_ready = False
 
     if Qskill_damage == True:
-        Qskill_arrow_y_pos += 15
-        
-    if attack_delay == True:
-        if pygame.time.get_ticks() - start_ticks - A_elapsed_time >= attack_delay_time:
-            attack_delay = False
+        Qskill_bullet_y_pos += 15
 
     if Qskill_delay == True:
         if pygame.time.get_ticks() - start_ticks - Q_elapsed_time >= Qskill_delay_time:
@@ -225,16 +217,15 @@ while running:
     if character_Bowmaster_x_pos > screen_width - character_Bowmaster_width:
         character_Bowmaster_x_pos = screen_width - character_Bowmaster_width
     
-    # 화살 위치 조정
-    for w in arrows:
+    # 총알 위치 조정
+    for w in bullets:
         if w[2] == 1:
-            arrows = [ [w[0] - arrow_speed, w[1], w[2]]]
+            bullets = [ [w[0] - bullet_speed, w[1], w[2]]]
         else:
-            arrows = [ [w[0] + arrow_speed, w[1], w[2]]]
-    
+            bullets = [ [w[0] + bullet_speed, w[1], w[2]]]
 
-    # 바닥 또는 벽에 닿은 화살 없애기
-    arrows = [ [w[0], w[1], w[2]] for w in arrows if (w[0] < 0) or (w[0] > screen_width - arrow_width) or (w[1] < screen_height - stage_height)]
+    # 바닥 또는 벽에 닿은 총알 없애기
+    bullets = [ [w[0], w[1], w[2], w[3]] for w in bullets if (w[0] < 0) or (w[0] > screen_width - bullet_width) or (w[1] < screen_height - stage_height)]
    
     # 4. 충돌 처리 
     # 필수 (캐릭터 크기를 재는 함수들)
@@ -246,35 +237,35 @@ while running:
     enemy_slime_rect.left = enemy_slime_x_pos
     enemy_slime_rect.top = enemy_slime_y_pos
 
-    Qskill_arrow_rect = Qskill_arrow.get_rect()
-    Qskill_arrow_rect.left = Qskill_arrow_x_pos
-    Qskill_arrow_rect.top = Qskill_arrow_y_pos
+    Qskill_bullet_rect = Qskill_bullet.get_rect()
+    Qskill_bullet_rect.left = Qskill_bullet_x_pos
+    Qskill_bullet_rect.top = Qskill_bullet_y_pos
 
     platform_rect = platform.get_rect()
     platform_rect.left = platform_x_pos
     platform_rect.top = platform_y_pos
     
-    for arrow_idx, arrow_val in enumerate(arrows):
-        arrow_pos_x = arrow_val[0]
-        arrow_pos_y = arrow_val[1]
+    for bullet_idx, bullet_val in enumerate(bullets):
+        bullet_pos_x = bullet_val[0]
+        bullet_pos_y = bullet_val[1]
 
-        arrow_rect = arrow.get_rect()
-        arrow_rect.left = arrow_pos_x
-        arrow_rect.right = arrow_pos_y
+        bullet_rect = bullet_1.get_rect()
+        bullet_rect.left = bullet_pos_x
+        bullet_rect.right = bullet_pos_y
 
-        if arrow_rect.colliderect(enemy_slime_rect): # 화살과 슬라임이 충돌
-            arrow_to_remove = arrow_idx
+        if bullet_rect.colliderect(enemy_slime_rect): # 총알과 슬라임이 충돌
+            bullet_to_remove = bullet_idx
             character_Bowmaster_Exp += enemy_slime_Exp
             enemy_slime_regen_time = pygame.time.get_ticks() - start_ticks
             Slime = False
             break
-        elif (arrow_x_pos < 0) or (arrow_x_pos > (screen_width - arrow_width)) or (arrow_y_pos > screen_height):
-            arrow_to_remove = arrow_idx
+        elif (bullet_x_pos < 0) or (bullet_x_pos > (screen_width - bullet_width)) or (bullet_y_pos > screen_height):
+            bullet_to_remove = bullet_idx
             break
 
-    if arrow_to_remove > -1:
-        del arrows[arrow_to_remove]
-        arrow_to_remove = -1
+    if bullet_to_remove > -1:
+        del bullets[bullet_to_remove]
+        bullet_to_remove = -1
     
     if character_Bowmaster_rect.colliderect(platform_rect): # 플랫폼 착지
         if (character_Bowmaster_y_pos + character_Bowmaster_height - 10) <= platform_y_pos and airborne_distance >= 0:
@@ -288,12 +279,12 @@ while running:
                 airborne_distance = 0
                 airborne = True
 
-    if Qskill_arrow_rect.colliderect(enemy_slime_rect):
+    if Qskill_bullet_rect.colliderect(enemy_slime_rect):
         Slime = False
         enemy_slime_regen_time = pygame.time.get_ticks() - start_ticks
         character_Bowmaster_Exp += enemy_slime_Exp
 
-    if Qskill_arrow_y_pos >= screen_height:
+    if Qskill_bullet_y_pos >= screen_height:
         Qskill_damage = False
 
     if character_Bowmaster_Exp >= MAX_Exp:
@@ -359,15 +350,15 @@ while running:
             screen.blit(character_Bowmaster_RIGHT, (character_Bowmaster_x_pos, character_Bowmaster_y_pos))
     if Slime == True:
         screen.blit(enemy_slime, (enemy_slime_x_pos, enemy_slime_y_pos))
-    for arrow_x_pos, arrow_y_pos, arrow_LEFT in arrows:
-        if arrow_LEFT == 1:
-            screen.blit(arrow, (arrow_x_pos, arrow_y_pos))
+    for bullet_x_pos, bullet_y_pos, bullet_LEFT in bullets:
+        if bullet_LEFT == 1:
+            screen.blit(bullet, (bullet_x_pos, bullet_y_pos))
         else:
-            screen.blit(arrow_RIGHT, (arrow_x_pos, arrow_y_pos))
+            screen.blit(bullet_RIGHT, (bullet_x_pos, bullet_y_pos))
     if Qskill_ready == True:
         screen.blit(Qskill_effect, (Qskill_effect_x_pos, screen_height - stage_height))
     if Qskill_damage == True:
-        screen.blit(Qskill_arrow, (Qskill_arrow_x_pos, Qskill_arrow_y_pos))
+        screen.blit(Qskill_bullet, (Qskill_bullet_x_pos, Qskill_bullet_y_pos))
     screen.blit(HP, ((screen_width - 200), 10))
     screen.blit(Exp, ((screen_width - 500), 10))
     screen.blit(Level, (10, 10))
