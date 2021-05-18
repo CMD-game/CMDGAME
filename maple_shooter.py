@@ -56,10 +56,9 @@ Qskill_effect_x_pos = 50
 Qskill_bullet_x_pos = 50
 Qskill_bullet_y_pos = 0
 
-
-character_Bowmaster_RIGHT = pygame.image.load(os.path.join(image_path, "M_character_Bowmaster_RIGHT.png"))
-character_Bowmaster = pygame.image.load(os.path.join(image_path, "M_character_Bowmaster_LEFT.png"))
-character_Bowmaster_size = character_Bowmaster.get_rect().size
+character_Bowmaster_RIGHT = pygame.image.load(os.path.join(image_path, "character_boshy.png"))
+character_Bowmaster = pygame.image.load(os.path.join(image_path, "character_boshy_LEFT.png"))
+character_Bowmaster_size = character_Bowmaster_RIGHT.get_rect().size
 character_Bowmaster_width = character_Bowmaster_size[0]
 character_Bowmaster_height = character_Bowmaster_size[1]
 character_Bowmaster_x_pos = (screen_width - character_Bowmaster_width)/ 2
@@ -77,15 +76,18 @@ character_Bowmaster_to_x_LEFT = 0
 character_Bowmaster_to_x_LEFT_press = 1 # 왼쪽을 보고 있는지 확인하기 위한 변수
 character_Bowmaster_to_x_RIGHT = 0
 character_Bowmaster_to_x_RIGHT_press = 0
-bullet_1 = pygame.image.load(os.path.join(image_path, "bullet_1.png"))
+
+bullet_images = [
+    pygame.image.load(os.path.join(image_path, "bullet_1.png")),
+    pygame.image.load(os.path.join(image_path, "bullet_2.png")),
+    pygame.image.load(os.path.join(image_path, "bullet_3.png")),
+    pygame.image.load(os.path.join(image_path, "bullet_4.png"))]
+
 bullet_1_using = False
-bullet_2 = pygame.image.load(os.path.join(image_path, "bullet_2.png"))
 bullet_2_using = False
-bullet_3 = pygame.image.load(os.path.join(image_path, "bullet_3.png"))
 bullet_3_using = False
-bullet_4 = pygame.image.load(os.path.join(image_path, "bullet_4.png"))
 bullet_4_using = False
-bullet_size = bullet_1.get_rect().size
+bullet_size = bullet_images[1].get_rect().size
 bullet_width = bullet_size[0]
 bullet_height = bullet_size[1]
 bullet_speed = 10
@@ -94,6 +96,12 @@ bullet_number = 1
 bullet_to_remove = -1
 
 bullets = []
+
+bullets.append({
+    "pos_x" : -100,
+    "pos_y" : -100,
+    "img_idx" : 1,
+    "to_x" : 0})
 
 enemy_slime = pygame.image.load(os.path.join(image_path, "M_enemy_slime.png"))
 enemy_slime_size = enemy_slime.get_rect().size
@@ -165,15 +173,17 @@ while running:
                 elif bullet_4_using == False:
                     bullet_4_using = True
                     bullet_number = 4
+                else:
+                    break
                 bullet_x_pos = character_Bowmaster_x_pos + (character_Bowmaster_width - bullet_width) / 2
-                bullet_y_pos = character_Bowmaster_y_pos + 25
+                bullet_y_pos = character_Bowmaster_y_pos + 5
                 if character_Bowmaster_to_x_LEFT_press == 1:
                     bullet_LEFT = 1
                 else:
                     bullet_LEFT = 0
                 bullets.append([bullet_x_pos, bullet_y_pos, bullet_LEFT, bullet_number])
             elif event.key == pygame.K_q: # q키를 누름 : 스킬1
-                if attack_delay == False and Qskill_delay == False and Qskill_ready == False and Qskill_input == False and Qskill_damage == False:
+                if Qskill_delay == False and Qskill_ready == False and Qskill_input == False and Qskill_damage == False:
                     Qskill_input = True
         
         if event.type == pygame.KEYUP:
@@ -230,16 +240,15 @@ while running:
     if character_Bowmaster_x_pos > screen_width - character_Bowmaster_width:
         character_Bowmaster_x_pos = screen_width - character_Bowmaster_width
     
-    # 총알 위치 조정
-    for w in bullets:
-        if w[2] == 1:
-            bullets = [ [w[0] - bullet_speed, w[1], w[2], w[3]]]
-        else:
-            bullets = [ [w[0] + bullet_speed, w[1], w[2], w[3]]]
+    # 총알 위치 정의
+    for bullet_idx, bullet_val in enumerate(bullets):
+        bullet_pos_x = bullet_val["pos_x"]
+        bullet_pos_y = bullet_val["pos_y"]
+        bullet_img_idx = bullet_val["img_idx"]
 
-    # 바닥 또는 벽에 닿은 총알 없애기
-    bullets = [ [w[0], w[1], w[2], w[3]] for w in bullets if (w[0] < 0) or (w[0] > screen_width - bullet_width) or (w[1] < screen_height - stage_height)]
-   
+        if bullet_pos_x < 0 or bullet_pos_x > screen_width - bullet_width:
+            bullet_to_remove = bullet_img_idx
+        
     # 4. 충돌 처리 
     # 필수 (캐릭터 크기를 재는 함수들)
     character_Bowmaster_rect = character_Bowmaster.get_rect()
@@ -253,37 +262,7 @@ while running:
     platform_rect = platform.get_rect()
     platform_rect.left = platform_x_pos
     platform_rect.top = platform_y_pos
-    
-    for bullet_idx, bullet_val in enumerate(bullets):
-        bullet_pos_x = bullet_val[0]
-        bullet_pos_y = bullet_val[1]
 
-        bullet_rect = bullet_1.get_rect()
-        bullet_rect.left = bullet_pos_x
-        bullet_rect.right = bullet_pos_y
-
-        if bullet_rect.colliderect(enemy_slime_rect): # 총알과 슬라임이 충돌
-            bullet_to_remove = bullet_idx
-            character_Bowmaster_Exp += enemy_slime_Exp
-            enemy_slime_regen_time = pygame.time.get_ticks() - start_ticks
-            Slime = False
-            break
-        elif (bullet_x_pos < 0) or (bullet_x_pos > (screen_width - bullet_width)) or (bullet_y_pos > screen_height):
-            bullet_to_remove = bullet_idx
-            break
-
-    if bullet_to_remove > -1:
-        for w in bullets[bullet_to_remove]:
-            if w[3] == 1:
-                bullet_1_using = False
-            if w[3] == 2:
-                bullet_2_using = False
-            if w[3] == 3:
-                bullet_3_using = False
-            if w[3] == 4:
-                bullet_4_using = False
-        del bullets[bullet_to_remove]
-        bullet_to_remove = -1
     
     if character_Bowmaster_rect.colliderect(platform_rect): # 플랫폼 착지
         if (character_Bowmaster_y_pos + character_Bowmaster_height - 10) <= platform_y_pos and airborne_distance >= 0:
@@ -363,15 +342,7 @@ while running:
             screen.blit(character_Bowmaster_RIGHT, (character_Bowmaster_x_pos, character_Bowmaster_y_pos))
     if Slime == True:
         screen.blit(enemy_slime, (enemy_slime_x_pos, enemy_slime_y_pos))
-    for bullet_x_pos, bullet_y_pos, bullet_LEFT, bullet_number in bullets:
-        if bullet_number == 1:
-            screen.blit(bullet_1, (bullet_x_pos, bullet_y_pos))
-        if bullet_number == 2:
-            screen.blit(bullet_2, (bullet_x_pos, bullet_y_pos))
-        if bullet_number == 3:
-            screen.blit(bullet_3, (bullet_x_pos, bullet_y_pos))
-        if bullet_number == 4:
-            screen.blit(bullet_4, (bullet_x_pos, bullet_y_pos))
+
     if Qskill_ready == True:
         screen.blit(Qskill_effect, (Qskill_effect_x_pos, screen_height - stage_height))
     screen.blit(HP, ((screen_width - 200), 10))
