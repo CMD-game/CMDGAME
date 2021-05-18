@@ -45,20 +45,15 @@ stage = pygame.image.load(os.path.join(image_path, "M_stage.png"))
 stage_size = stage.get_rect().size
 stage_height = stage_size[1]
 
+# 플랫폼은 하나가 제일 적당할 듯
 platform = pygame.image.load(os.path.join(image_path, "M_platform.png"))
 platform_x_pos = 300
 platform_y_pos = screen_height - 150
 
-Qskill_effect = pygame.image.load(os.path.join(image_path, "M_Qskill_effect.png"))
-Qskill_size = Qskill_effect.get_rect().size
-Qskill_width = Qskill_size[0]
-Qskill_effect_x_pos = 50
-Qskill_bullet_x_pos = 50
-Qskill_bullet_y_pos = 0
-
-character_boshy_RIGHT = pygame.image.load(os.path.join(image_path, "character_boshy.png"))
-character_boshy = pygame.image.load(os.path.join(image_path, "character_boshy_LEFT.png"))
-character_boshy_size = character_boshy_RIGHT.get_rect().size
+# 가져온 캐릭터 이름이 boshy
+character_boshy = pygame.image.load(os.path.join(image_path, "character_boshy.png"))
+character_boshy_LEFT = pygame.image.load(os.path.join(image_path, "character_boshy_LEFT.png"))
+character_boshy_size = character_boshy.get_rect().size
 character_boshy_width = character_boshy_size[0]
 character_boshy_height = character_boshy_size[1]
 character_boshy_x_pos = (screen_width - character_boshy_width)/ 2
@@ -77,16 +72,20 @@ character_boshy_to_x_LEFT_press = 1 # 왼쪽을 보고 있는지 확인하기 �
 character_boshy_to_x_RIGHT = 0
 character_boshy_to_x_RIGHT_press = 0
 
+# 총알 이미지
 bullet_images = [
     pygame.image.load(os.path.join(image_path, "bullet_1.png")),
     pygame.image.load(os.path.join(image_path, "bullet_2.png")),
     pygame.image.load(os.path.join(image_path, "bullet_3.png")),
     pygame.image.load(os.path.join(image_path, "bullet_4.png"))]
 
+# 총알 사용 여부 확인 변수
 bullet_1_using = False
 bullet_2_using = False
 bullet_3_using = False
 bullet_4_using = False
+
+# 총알 정보
 bullet_size = bullet_images[1].get_rect().size
 bullet_width = bullet_size[0]
 bullet_height = bullet_size[1]
@@ -118,18 +117,12 @@ start_ticks = pygame.time.get_ticks()
 
 running = True
 Slime = True 
-Shoot = False
-Qskill_ready = False
-Qskill_input = False
-Qskill_damage = False
-Qskill_delay = False
-Qskill_delay_time = 50
-airborne = False
-double_jump = True
-jump_height = -10
-jump_speed = 0.5
-airborne_distance = jump_height
-invincibility = 0
+airborne = False # 공중에 떠 있는지 확인하기 위한 변수
+double_jump = True # 더블점프가 가능한지 확인하기 위한 변수
+jump_height = -10 # 점프 시작시 속도
+jump_speed = 0.5 # 점프할동안 증가할 속도
+airborne_distance = jump_height # 점프 중 속도
+invincibility = 0 # 피격 시 무적 확인 변수
 while running:
     dt = clock.tick(60) # 프레임 수
 
@@ -152,13 +145,13 @@ while running:
                 elif double_jump == True:
                     double_jump = False
                     airborne_distance = jump_height
-            elif event.key == pygame.K_DOWN:
-                character_boshy_y_pos += 20
+            elif event.key == pygame.K_DOWN: # 하향점프
+                character_boshy_y_pos += 20 # y좌표를 20만큼 내려서 발판에서 떨어지게 만듦
                 airborne = True
-                airborne_distance = 5
+                airborne_distance = 5 # 하향점프의 처음 속도는 5
             elif event.key == pygame.K_a: # a키를 누름 : 공격
-                try:
-                    if bullet_1_using == False:
+                try: # try/except/else 구문 : try에서 error가 발생하면 except, 아니면 else 실행
+                    if bullet_1_using == False: # 총알 사용 여부 확인
                         bullet_1_using = True
                         bullet_number = 0
                     elif bullet_2_using == False:
@@ -170,25 +163,22 @@ while running:
                     elif bullet_4_using == False:
                         bullet_4_using = True
                         bullet_number = 3
-                    else: 
+                    else: # 모든 총알이 사용중일 때 a를 누르면 고의로 에러 발생
                         print(5/0)
-                except ZeroDivisionError:
+                except ZeroDivisionError: # 에러가 나면 break
                     break
-                else: 
+                else: # 아니면 총알의 정보를 수집해 저장
                     bullet_x_pos = character_boshy_x_pos + (character_boshy_width - bullet_width) / 2
                     bullet_y_pos = character_boshy_y_pos + 10
-                    if character_boshy_to_x_LEFT_press == 1:
+                    if character_boshy_to_x_LEFT_press == 1: # 왼쪽을 보고 있다면 to_x의 부호 반대
                         bullet_LEFT = -1
                     else:
                         bullet_LEFT = 1
                     bullets.append({
-                        "pos_x" : bullet_x_pos,
+                        "pos_x" : bullet_x_pos, 
                         "pos_y" : bullet_y_pos,
                         "img_idx" : bullet_number,
-                        "to_x" : bullet_speed * bullet_LEFT })
-            elif event.key == pygame.K_q: # q키를 누름 : 스킬1
-                if Qskill_delay == False and Qskill_ready == False and Qskill_input == False and Qskill_damage == False:
-                    Qskill_input = True
+                        "to_x" : bullet_speed * bullet_LEFT }) # 딕셔너리를 이용함, 중괄호 안의 수치는 변경 가능
         
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
@@ -197,46 +187,15 @@ while running:
                 character_boshy_to_x_RIGHT = 0
 
     if airborne == True: # 점프
-        character_boshy_y_pos += airborne_distance
-        airborne_distance += jump_speed
-        if airborne_distance > 10:
+        character_boshy_y_pos += airborne_distance # 캐릭터가 점프 속도만큼 이동
+        airborne_distance += jump_speed # 점프 속도 증가
+        if airborne_distance > 10: # 종단 속도
             airborne_distance = 10
         if character_boshy_y_pos >= screen_height - stage_height - character_boshy_height:
             airborne = False
             character_boshy_y_pos = screen_height - stage_height - character_boshy_height
             airborne_distance = jump_height
             double_jump = True
-
-    if Qskill_input == True:
-        if character_boshy_to_x_LEFT_press == 1:
-            Qskill_effect_x_pos = character_boshy_x_pos - 200 - character_boshy_width
-        else:
-            Qskill_effect_x_pos = character_boshy_x_pos + 200
-        if Qskill_effect_x_pos < 0:
-            Qskill_effect_x_pos = 0
-        if Qskill_effect_x_pos > screen_width - Qskill_width:
-            Qskill_effect_x_pos = screen_width - Qskill_width
-        attack_delay = True
-        A_elapsed_time = pygame.time.get_ticks() - start_ticks
-        Q_damage_elapsed_time = pygame.time.get_ticks() - start_ticks
-        Qskill_ready = True
-        Qskill_input = False
-
-    if Qskill_ready == True:
-        Qskill_bullet_x_pos = Qskill_effect_x_pos
-        Qskill_bullet_y_pos = 0
-        Q_elapsed_time = pygame.time.get_ticks() - start_ticks
-        Qskill_delay = True
-        if pygame.time.get_ticks() - start_ticks - Q_damage_elapsed_time >= 1000:
-            Qskill_damage = True
-            Qskill_ready = False
-
-    if Qskill_damage == True:
-        Qskill_bullet_y_pos += 15
-
-    if Qskill_delay == True:
-        if pygame.time.get_ticks() - start_ticks - Q_elapsed_time >= Qskill_delay_time:
-            Qskill_delay = False
 
     character_boshy_x_pos += (character_boshy_to_x_LEFT + character_boshy_to_x_RIGHT) * dt # 캐릭터 이동
     if character_boshy_x_pos < 0:
@@ -262,21 +221,22 @@ while running:
     for bullet_idx, bullet_val in enumerate(bullets):
         bullet_pos_x = bullet_val["pos_x"]
         bullet_pos_y = bullet_val["pos_y"]
-        bullet_img_idx = bullet_val["img_idx"]
+        bullet_img_idx = bullet_val["img_idx"] # 위에서 정의한 총알의 정보를 딕셔너리를 이용해 값 추출
 
         bullet_rect = bullet_images[bullet_img_idx].get_rect()
         bullet_rect.left = bullet_pos_x
         bullet_rect.top = bullet_pos_y
 
-        if bullet_rect.colliderect(enemy_slime_rect):
+        if bullet_rect.colliderect(enemy_slime_rect): # 총알과 슬라임이 충돌
             Slime = False
             character_boshy_Exp += 10
+            slime_start_ticks = pygame.time.get_ticks()
             bullet_to_remove = bullet_img_idx
             break
         elif bullet_pos_x < 0 or bullet_pos_x > screen_width - bullet_width: # 가로벽에 닿았을 때
             bullet_to_remove = bullet_img_idx
 
-        if bullet_to_remove > -1:
+        if bullet_to_remove > -1: # bullet_to_remove의 최초값은 -1
             if bullet_to_remove == 0:
                 bullet_1_using = False
             elif bullet_to_remove == 1:
@@ -284,11 +244,11 @@ while running:
             elif bullet_to_remove == 2:
                 bullet_3_using = False
             else: 
-                bullet_4_using = False
-            del bullets[bullet_to_remove]
-            bullet_to_remove = -1
+                bullet_4_using = False # 총알을 다시 사용가능하게 함
+            del bullets[bullet_to_remove] # 사용된 총알 제거 // ******총알을 2발이상 발사할 시 이 줄에서 문제 발생
+            bullet_to_remove = -1 # 변수값 초기화
         else:
-            bullet_val["pos_x"] += bullet_val["to_x"]
+            bullet_val["pos_x"] += bullet_val["to_x"] # 총알 이동
 
     if character_boshy_rect.colliderect(platform_rect): # 플랫폼 착지
         if (character_boshy_y_pos + character_boshy_height - 10) <= platform_y_pos and airborne_distance >= 0:
@@ -302,9 +262,6 @@ while running:
                 airborne_distance = 0
                 airborne = True
 
-    if Qskill_bullet_y_pos >= screen_height:
-        Qskill_damage = False
-
     if character_boshy_Exp >= MAX_Exp:
         character_boshy_Exp -= MAX_Exp
         character_boshy_Level += 1
@@ -314,7 +271,7 @@ while running:
 
     if Slime == False:
         enemy_slime_x_pos = -1000
-        if (pygame.time.get_ticks() - start_ticks) - enemy_slime_regen_time >= enemy_slime_regen:
+        if (pygame.time.get_ticks() - slime_start_ticks) - enemy_slime_regen_time >= enemy_slime_regen:
             Slime = True
 
     if Slime == True:
@@ -332,7 +289,7 @@ while running:
         invincibility_time = pygame.time.get_ticks() - start_ticks
         invincibility = 1
     if invincibility == 1:
-        if (pygame.time.get_ticks() - start_ticks) - invincibility_time >= 1000: # 1: 무적 시간(초)
+        if (pygame.time.get_ticks() - start_ticks) - invincibility_time >= 1000: # 1000: 무적 시간(ms)
             invincibility = 0
 
     # 게임 화면 표시
@@ -349,33 +306,31 @@ while running:
             pass
         else:
             if (character_boshy_to_x_LEFT + character_boshy_to_x_RIGHT) > 0:
-                screen.blit(character_boshy_RIGHT, (character_boshy_x_pos, character_boshy_y_pos))
+                screen.blit(character_boshy, (character_boshy_x_pos, character_boshy_y_pos))
             elif (character_boshy_to_x_LEFT + character_boshy_to_x_RIGHT) < 0:
-                screen.blit(character_boshy, (character_boshy_x_pos, character_boshy_y_pos))
+                screen.blit(character_boshy_LEFT, (character_boshy_x_pos, character_boshy_y_pos))
             elif character_boshy_to_x_RIGHT_press == 0:
-                screen.blit(character_boshy, (character_boshy_x_pos, character_boshy_y_pos))
+                screen.blit(character_boshy_LEFT, (character_boshy_x_pos, character_boshy_y_pos))
             else:
-                screen.blit(character_boshy_RIGHT, (character_boshy_x_pos, character_boshy_y_pos))
+                screen.blit(character_boshy, (character_boshy_x_pos, character_boshy_y_pos))
     else:
         if (character_boshy_to_x_LEFT + character_boshy_to_x_RIGHT) > 0:
-            screen.blit(character_boshy_RIGHT, (character_boshy_x_pos, character_boshy_y_pos))
+            screen.blit(character_boshy, (character_boshy_x_pos, character_boshy_y_pos))
         elif (character_boshy_to_x_LEFT + character_boshy_to_x_RIGHT) < 0:
-            screen.blit(character_boshy, (character_boshy_x_pos, character_boshy_y_pos))
+            screen.blit(character_boshy_LEFT, (character_boshy_x_pos, character_boshy_y_pos))
         elif character_boshy_to_x_RIGHT_press == 0:
-            screen.blit(character_boshy, (character_boshy_x_pos, character_boshy_y_pos))
+            screen.blit(character_boshy_LEFT, (character_boshy_x_pos, character_boshy_y_pos))
         else:
-            screen.blit(character_boshy_RIGHT, (character_boshy_x_pos, character_boshy_y_pos))
+            screen.blit(character_boshy, (character_boshy_x_pos, character_boshy_y_pos))
     if Slime == True:
         screen.blit(enemy_slime, (enemy_slime_x_pos, enemy_slime_y_pos))
 
-    for idx, val in enumerate(bullets):
+    for idx, val in enumerate(bullets): # 모든 총알에 대해 정보를 불러와 그리기
         bullet_pos_x = val["pos_x"]
         bullet_pos_y = val["pos_y"]
         bullet_img_idx = val["img_idx"]
         screen.blit(bullet_images[bullet_img_idx], (bullet_pos_x, bullet_pos_y))
 
-    if Qskill_ready == True:
-        screen.blit(Qskill_effect, (Qskill_effect_x_pos, screen_height - stage_height))
     screen.blit(HP, ((screen_width - 200), 10))
     screen.blit(Exp, ((screen_width - 500), 10))
     screen.blit(Level, (10, 10))
