@@ -12,7 +12,7 @@
 
 # 게임 이미지
 # 배경 : 640 * 480 (가로 세로) - M_background.png
-# 캐릭터 : 50 * 100 - M_character_Bowmaster.png
+# 캐릭터 : 50 * 100 - M_character_boshy.png
 # 적 : 50 * 50 - M_enemy.png
 
 import pygame
@@ -56,26 +56,26 @@ Qskill_effect_x_pos = 50
 Qskill_bullet_x_pos = 50
 Qskill_bullet_y_pos = 0
 
-character_Bowmaster_RIGHT = pygame.image.load(os.path.join(image_path, "character_boshy.png"))
-character_Bowmaster = pygame.image.load(os.path.join(image_path, "character_boshy_LEFT.png"))
-character_Bowmaster_size = character_Bowmaster_RIGHT.get_rect().size
-character_Bowmaster_width = character_Bowmaster_size[0]
-character_Bowmaster_height = character_Bowmaster_size[1]
-character_Bowmaster_x_pos = (screen_width - character_Bowmaster_width)/ 2
-character_Bowmaster_y_pos = screen_height - character_Bowmaster_height - stage_height
+character_boshy_RIGHT = pygame.image.load(os.path.join(image_path, "character_boshy.png"))
+character_boshy = pygame.image.load(os.path.join(image_path, "character_boshy_LEFT.png"))
+character_boshy_size = character_boshy_RIGHT.get_rect().size
+character_boshy_width = character_boshy_size[0]
+character_boshy_height = character_boshy_size[1]
+character_boshy_x_pos = (screen_width - character_boshy_width)/ 2
+character_boshy_y_pos = screen_height - character_boshy_height - stage_height
 
-character_Bowmaster_speed = 0.3
-character_Bowmaster_HP = 100
-character_Bowmaster_Exp = 0
-character_Bowmaster_Level = 1
+character_boshy_speed = 0.3
+character_boshy_HP = 100
+character_boshy_Exp = 0
+character_boshy_Level = 1
 MAX_Exp = 100
 MAX_HP = 100
 invincibility = 0
 
-character_Bowmaster_to_x_LEFT = 0
-character_Bowmaster_to_x_LEFT_press = 1 # 왼쪽을 보고 있는지 확인하기 위한 변수
-character_Bowmaster_to_x_RIGHT = 0
-character_Bowmaster_to_x_RIGHT_press = 0
+character_boshy_to_x_LEFT = 0
+character_boshy_to_x_LEFT_press = 1 # 왼쪽을 보고 있는지 확인하기 위한 변수
+character_boshy_to_x_RIGHT = 0
+character_boshy_to_x_RIGHT_press = 0
 
 bullet_images = [
     pygame.image.load(os.path.join(image_path, "bullet_1.png")),
@@ -93,15 +93,11 @@ bullet_height = bullet_size[1]
 bullet_speed = 10
 bullet_LEFT = 1
 bullet_number = 1
-bullet_to_remove = -1
 
 bullets = []
 
-bullets.append({
-    "pos_x" : -100,
-    "pos_y" : -100,
-    "img_idx" : 1,
-    "to_x" : 0})
+# 사라질 총알 저장 변수
+bullet_to_remove = -1
 
 enemy_slime = pygame.image.load(os.path.join(image_path, "M_enemy_slime.png"))
 enemy_slime_size = enemy_slime.get_rect().size
@@ -143,13 +139,13 @@ while running:
             running = False 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                character_Bowmaster_to_x_LEFT -= character_Bowmaster_speed
-                character_Bowmaster_to_x_LEFT_press = 1
-                character_Bowmaster_to_x_RIGHT_press = 0
+                character_boshy_to_x_LEFT -= character_boshy_speed
+                character_boshy_to_x_LEFT_press = 1
+                character_boshy_to_x_RIGHT_press = 0
             elif event.key == pygame.K_RIGHT:
-                character_Bowmaster_to_x_RIGHT += character_Bowmaster_speed
-                character_Bowmaster_to_x_LEFT_press = 0
-                character_Bowmaster_to_x_RIGHT_press = 1
+                character_boshy_to_x_RIGHT += character_boshy_speed
+                character_boshy_to_x_LEFT_press = 0
+                character_boshy_to_x_RIGHT_press = 1
             elif event.key == pygame.K_UP:
                 if airborne == False:
                     airborne = True
@@ -157,57 +153,65 @@ while running:
                     double_jump = False
                     airborne_distance = jump_height
             elif event.key == pygame.K_DOWN:
-                character_Bowmaster_y_pos += 20
+                character_boshy_y_pos += 20
                 airborne = True
                 airborne_distance = 5
             elif event.key == pygame.K_a: # a키를 누름 : 공격
-                if bullet_1_using == False:
-                    bullet_1_using = True
-                    bullet_number = 1
-                elif bullet_2_using == False:
-                    bullet_2_using = True
-                    bullet_number = 2
-                elif bullet_3_using == False:
-                    bullet_3_using = True
-                    bullet_number = 3
-                elif bullet_4_using == False:
-                    bullet_4_using = True
-                    bullet_number = 4
-                else:
+                try:
+                    if bullet_1_using == False:
+                        bullet_1_using = True
+                        bullet_number = 0
+                    elif bullet_2_using == False:
+                        bullet_2_using = True
+                        bullet_number = 1
+                    elif bullet_3_using == False:
+                        bullet_3_using = True
+                        bullet_number = 2
+                    elif bullet_4_using == False:
+                        bullet_4_using = True
+                        bullet_number = 3
+                    else: 
+                        print(5/0)
+                except ZeroDivisionError:
                     break
-                bullet_x_pos = character_Bowmaster_x_pos + (character_Bowmaster_width - bullet_width) / 2
-                bullet_y_pos = character_Bowmaster_y_pos + 5
-                if character_Bowmaster_to_x_LEFT_press == 1:
-                    bullet_LEFT = 1
-                else:
-                    bullet_LEFT = 0
-                bullets.append([bullet_x_pos, bullet_y_pos, bullet_LEFT, bullet_number])
+                else: 
+                    bullet_x_pos = character_boshy_x_pos + (character_boshy_width - bullet_width) / 2
+                    bullet_y_pos = character_boshy_y_pos + 10
+                    if character_boshy_to_x_LEFT_press == 1:
+                        bullet_LEFT = -1
+                    else:
+                        bullet_LEFT = 1
+                    bullets.append({
+                        "pos_x" : bullet_x_pos,
+                        "pos_y" : bullet_y_pos,
+                        "img_idx" : bullet_number,
+                        "to_x" : bullet_speed * bullet_LEFT })
             elif event.key == pygame.K_q: # q키를 누름 : 스킬1
                 if Qskill_delay == False and Qskill_ready == False and Qskill_input == False and Qskill_damage == False:
                     Qskill_input = True
         
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
-                character_Bowmaster_to_x_LEFT = 0
+                character_boshy_to_x_LEFT = 0
             elif event.key == pygame.K_RIGHT:
-                character_Bowmaster_to_x_RIGHT = 0
+                character_boshy_to_x_RIGHT = 0
 
     if airborne == True: # 점프
-        character_Bowmaster_y_pos += airborne_distance
+        character_boshy_y_pos += airborne_distance
         airborne_distance += jump_speed
         if airborne_distance > 10:
             airborne_distance = 10
-        if character_Bowmaster_y_pos >= screen_height - stage_height - character_Bowmaster_height:
+        if character_boshy_y_pos >= screen_height - stage_height - character_boshy_height:
             airborne = False
-            character_Bowmaster_y_pos = screen_height - stage_height - character_Bowmaster_height
+            character_boshy_y_pos = screen_height - stage_height - character_boshy_height
             airborne_distance = jump_height
             double_jump = True
 
     if Qskill_input == True:
-        if character_Bowmaster_to_x_LEFT_press == 1:
-            Qskill_effect_x_pos = character_Bowmaster_x_pos - 200 - character_Bowmaster_width
+        if character_boshy_to_x_LEFT_press == 1:
+            Qskill_effect_x_pos = character_boshy_x_pos - 200 - character_boshy_width
         else:
-            Qskill_effect_x_pos = character_Bowmaster_x_pos + 200
+            Qskill_effect_x_pos = character_boshy_x_pos + 200
         if Qskill_effect_x_pos < 0:
             Qskill_effect_x_pos = 0
         if Qskill_effect_x_pos > screen_width - Qskill_width:
@@ -234,26 +238,17 @@ while running:
         if pygame.time.get_ticks() - start_ticks - Q_elapsed_time >= Qskill_delay_time:
             Qskill_delay = False
 
-    character_Bowmaster_x_pos += (character_Bowmaster_to_x_LEFT + character_Bowmaster_to_x_RIGHT) * dt # 캐릭터 이동
-    if character_Bowmaster_x_pos < 0:
-        character_Bowmaster_x_pos = 0
-    if character_Bowmaster_x_pos > screen_width - character_Bowmaster_width:
-        character_Bowmaster_x_pos = screen_width - character_Bowmaster_width
-    
-    # 총알 위치 정의
-    for bullet_idx, bullet_val in enumerate(bullets):
-        bullet_pos_x = bullet_val["pos_x"]
-        bullet_pos_y = bullet_val["pos_y"]
-        bullet_img_idx = bullet_val["img_idx"]
-
-        if bullet_pos_x < 0 or bullet_pos_x > screen_width - bullet_width:
-            bullet_to_remove = bullet_img_idx
+    character_boshy_x_pos += (character_boshy_to_x_LEFT + character_boshy_to_x_RIGHT) * dt # 캐릭터 이동
+    if character_boshy_x_pos < 0:
+        character_boshy_x_pos = 0
+    if character_boshy_x_pos > screen_width - character_boshy_width:
+        character_boshy_x_pos = screen_width - character_boshy_width
         
     # 4. 충돌 처리 
     # 필수 (캐릭터 크기를 재는 함수들)
-    character_Bowmaster_rect = character_Bowmaster.get_rect()
-    character_Bowmaster_rect.left = character_Bowmaster_x_pos
-    character_Bowmaster_rect.top = character_Bowmaster_y_pos
+    character_boshy_rect = character_boshy.get_rect()
+    character_boshy_rect.left = character_boshy_x_pos
+    character_boshy_rect.top = character_boshy_y_pos
 
     enemy_slime_rect = enemy_slime.get_rect()
     enemy_slime_rect.left = enemy_slime_x_pos
@@ -263,15 +258,46 @@ while running:
     platform_rect.left = platform_x_pos
     platform_rect.top = platform_y_pos
 
-    
-    if character_Bowmaster_rect.colliderect(platform_rect): # 플랫폼 착지
-        if (character_Bowmaster_y_pos + character_Bowmaster_height - 10) <= platform_y_pos and airborne_distance >= 0:
+    # 총알 위치 정의
+    for bullet_idx, bullet_val in enumerate(bullets):
+        bullet_pos_x = bullet_val["pos_x"]
+        bullet_pos_y = bullet_val["pos_y"]
+        bullet_img_idx = bullet_val["img_idx"]
+
+        bullet_rect = bullet_images[bullet_img_idx].get_rect()
+        bullet_rect.left = bullet_pos_x
+        bullet_rect.top = bullet_pos_y
+
+        if bullet_rect.colliderect(enemy_slime_rect):
+            Slime = False
+            character_boshy_Exp += 10
+            bullet_to_remove = bullet_img_idx
+            break
+        elif bullet_pos_x < 0 or bullet_pos_x > screen_width - bullet_width: # 가로벽에 닿았을 때
+            bullet_to_remove = bullet_img_idx
+
+        if bullet_to_remove > -1:
+            if bullet_to_remove == 0:
+                bullet_1_using = False
+            elif bullet_to_remove == 1:
+                bullet_2_using = False
+            elif bullet_to_remove == 2:
+                bullet_3_using = False
+            else: 
+                bullet_4_using = False
+            del bullets[bullet_to_remove]
+            bullet_to_remove = -1
+        else:
+            bullet_val["pos_x"] += bullet_val["to_x"]
+
+    if character_boshy_rect.colliderect(platform_rect): # 플랫폼 착지
+        if (character_boshy_y_pos + character_boshy_height - 10) <= platform_y_pos and airborne_distance >= 0:
             airborne = False
             airborne_distance = jump_height
-            character_Bowmaster_y_pos = platform_y_pos - character_Bowmaster_height + 1
+            character_boshy_y_pos = platform_y_pos - character_boshy_height + 1
             double_jump = True
     else:
-        if character_Bowmaster_y_pos + character_Bowmaster_height < screen_height - stage_height:
+        if character_boshy_y_pos + character_boshy_height < screen_height - stage_height:
             if airborne == False:
                 airborne_distance = 0
                 airborne = True
@@ -279,12 +305,12 @@ while running:
     if Qskill_bullet_y_pos >= screen_height:
         Qskill_damage = False
 
-    if character_Bowmaster_Exp >= MAX_Exp:
-        character_Bowmaster_Exp -= MAX_Exp
-        character_Bowmaster_Level += 1
+    if character_boshy_Exp >= MAX_Exp:
+        character_boshy_Exp -= MAX_Exp
+        character_boshy_Level += 1
         MAX_Exp += MAX_Exp * 0.1 # MAX Exp, Hp 는 모두 1.1배 
         MAX_HP += MAX_HP * 0.1
-        character_Bowmaster_HP = MAX_HP # 레벨업시 즉시 회복
+        character_boshy_HP = MAX_HP # 레벨업시 즉시 회복
 
     if Slime == False:
         enemy_slime_x_pos = -1000
@@ -295,11 +321,10 @@ while running:
         enemy_slime_x_pos = 0
 
     if invincibility == 0: # 무적이 아닐 때
-        if character_Bowmaster_rect.colliderect(enemy_slime_rect): # 캐릭터와 슬라임이 충돌
-            character_Bowmaster_HP -= enemy_slime_attack
-            print("HP - " + str(int(enemy_slime_attack)) + ", 남은 HP : " + str(int(character_Bowmaster_HP)))
+        if character_boshy_rect.colliderect(enemy_slime_rect): # 캐릭터와 슬라임이 충돌
+            character_boshy_HP -= enemy_slime_attack
             invincibility = 2
-            if character_Bowmaster_HP <= 0:
+            if character_boshy_HP <= 0:
                 print("game over")
                 running = False
 
@@ -311,9 +336,9 @@ while running:
             invincibility = 0
 
     # 게임 화면 표시
-    HP = game_font.render("HP : {} / {}".format(int(character_Bowmaster_HP), int(MAX_HP)), True, (255, 0, 0))
-    Exp = game_font.render("Exp : {} / {}".format(int(character_Bowmaster_Exp), int(MAX_Exp)), True, (255, 255, 0))
-    Level = game_font.render("Lv.{}".format(int(character_Bowmaster_Level)), True, (0, 255, 0))
+    HP = game_font.render("HP : {} / {}".format(int(character_boshy_HP), int(MAX_HP)), True, (255, 0, 0))
+    Exp = game_font.render("Exp : {} / {}".format(int(character_boshy_Exp), int(MAX_Exp)), True, (255, 255, 0))
+    Level = game_font.render("Lv.{}".format(int(character_boshy_Level)), True, (0, 255, 0))
 
     # 5. 화면에 그리기
     screen.blit(background, (0, 0))
@@ -323,25 +348,31 @@ while running:
         if int((pygame.time.get_ticks() - start_ticks - invincibility_time) / 250) % 2 == 0:
             pass
         else:
-            if (character_Bowmaster_to_x_LEFT + character_Bowmaster_to_x_RIGHT) > 0:
-                screen.blit(character_Bowmaster_RIGHT, (character_Bowmaster_x_pos, character_Bowmaster_y_pos))
-            elif (character_Bowmaster_to_x_LEFT + character_Bowmaster_to_x_RIGHT) < 0:
-                screen.blit(character_Bowmaster, (character_Bowmaster_x_pos, character_Bowmaster_y_pos))
-            elif character_Bowmaster_to_x_RIGHT_press == 0:
-                screen.blit(character_Bowmaster, (character_Bowmaster_x_pos, character_Bowmaster_y_pos))
+            if (character_boshy_to_x_LEFT + character_boshy_to_x_RIGHT) > 0:
+                screen.blit(character_boshy_RIGHT, (character_boshy_x_pos, character_boshy_y_pos))
+            elif (character_boshy_to_x_LEFT + character_boshy_to_x_RIGHT) < 0:
+                screen.blit(character_boshy, (character_boshy_x_pos, character_boshy_y_pos))
+            elif character_boshy_to_x_RIGHT_press == 0:
+                screen.blit(character_boshy, (character_boshy_x_pos, character_boshy_y_pos))
             else:
-                screen.blit(character_Bowmaster_RIGHT, (character_Bowmaster_x_pos, character_Bowmaster_y_pos))
+                screen.blit(character_boshy_RIGHT, (character_boshy_x_pos, character_boshy_y_pos))
     else:
-        if (character_Bowmaster_to_x_LEFT + character_Bowmaster_to_x_RIGHT) > 0:
-            screen.blit(character_Bowmaster_RIGHT, (character_Bowmaster_x_pos, character_Bowmaster_y_pos))
-        elif (character_Bowmaster_to_x_LEFT + character_Bowmaster_to_x_RIGHT) < 0:
-            screen.blit(character_Bowmaster, (character_Bowmaster_x_pos, character_Bowmaster_y_pos))
-        elif character_Bowmaster_to_x_RIGHT_press == 0:
-            screen.blit(character_Bowmaster, (character_Bowmaster_x_pos, character_Bowmaster_y_pos))
+        if (character_boshy_to_x_LEFT + character_boshy_to_x_RIGHT) > 0:
+            screen.blit(character_boshy_RIGHT, (character_boshy_x_pos, character_boshy_y_pos))
+        elif (character_boshy_to_x_LEFT + character_boshy_to_x_RIGHT) < 0:
+            screen.blit(character_boshy, (character_boshy_x_pos, character_boshy_y_pos))
+        elif character_boshy_to_x_RIGHT_press == 0:
+            screen.blit(character_boshy, (character_boshy_x_pos, character_boshy_y_pos))
         else:
-            screen.blit(character_Bowmaster_RIGHT, (character_Bowmaster_x_pos, character_Bowmaster_y_pos))
+            screen.blit(character_boshy_RIGHT, (character_boshy_x_pos, character_boshy_y_pos))
     if Slime == True:
         screen.blit(enemy_slime, (enemy_slime_x_pos, enemy_slime_y_pos))
+
+    for idx, val in enumerate(bullets):
+        bullet_pos_x = val["pos_x"]
+        bullet_pos_y = val["pos_y"]
+        bullet_img_idx = val["img_idx"]
+        screen.blit(bullet_images[bullet_img_idx], (bullet_pos_x, bullet_pos_y))
 
     if Qskill_ready == True:
         screen.blit(Qskill_effect, (Qskill_effect_x_pos, screen_height - stage_height))
