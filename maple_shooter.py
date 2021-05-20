@@ -97,6 +97,7 @@ bullets = []
 
 # 사라질 총알 저장 변수
 bullet_to_remove = -1
+bullet_not_using = 0
 
 enemy_slime = pygame.image.load(os.path.join(image_path, "M_enemy_slime.png"))
 enemy_slime_size = enemy_slime.get_rect().size
@@ -235,20 +236,44 @@ while running:
             break
         elif bullet_pos_x < 0 or bullet_pos_x > screen_width - bullet_width: # 가로벽에 닿았을 때
             bullet_to_remove = bullet_img_idx
+        else:
+            bullet_val["pos_x"] += bullet_val["to_x"] # 총알 이동
 
         if bullet_to_remove > -1: # bullet_to_remove의 최초값은 -1
             if bullet_to_remove == 0:
-                bullet_1_using = False
+                bullet_1_using = False               
             elif bullet_to_remove == 1:
+                if bullet_1_using == True:
+                    break
+                else:
+                    bullet_not_using += 1
                 bullet_2_using = False
             elif bullet_to_remove == 2:
-                bullet_3_using = False
-            else: 
+                if bullet_1_using == True:
+                    break
+                else:
+                    bullet_not_using += 1
+                if bullet_2_using == True:
+                    break
+                else:
+                    bullet_not_using += 1
+            else:
+                if bullet_1_using == True:
+                    break
+                else:
+                    bullet_not_using += 1
+                if bullet_2_using == True:
+                    break
+                else:
+                    bullet_not_using += 1
+                if bullet_3_using == True:
+                    break
+                else:
+                    bullet_not_using += 1
                 bullet_4_using = False # 총알을 다시 사용가능하게 함
-            del bullets[bullet_to_remove] # 사용된 총알 제거 // ******총알을 2발이상 발사할 시 이 줄에서 문제 발생
+            del bullets[bullet_to_remove - bullet_not_using] # 사용된 총알 제거 // ******총알을 2발이상 발사할 시 이 줄에서 문제 발생 
             bullet_to_remove = -1 # 변수값 초기화
-        else:
-            bullet_val["pos_x"] += bullet_val["to_x"] # 총알 이동
+            bullet_not_using = 0
 
     if character_boshy_rect.colliderect(platform_rect): # 플랫폼 착지
         if (character_boshy_y_pos + character_boshy_height - 10) <= platform_y_pos and airborne_distance >= 0:
