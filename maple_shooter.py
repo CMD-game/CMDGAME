@@ -3,12 +3,9 @@
 ####### 이 버전엔 버그 있음
 # 0. 더 좋은 조건이 있다면 추가나 수정 바람
 # 1. 캐릭터 : 좌우로 움직일 수 있고 캐릭터에 따라 다른 무기를 사용 가능
-# 2. 보스를 잡으면서 진행, 보스를 잡을 때마다 레벨이 오름
-# 4. 
-# 5. 일정 레벨 이상이면 더 강력한 스킬 사용 가능
-# 6. 적에게 닿으면 HP 감소, HP가 0이 되면 게임 오버
-# 7. 적을 죽이면 일정 확률로 인벤토리에 HP, MP 물약이 들어옴
-# 8. 모든 평타와 스킬에는 공통적인 쿨타임(장전 시간)이 있고, 스킬에는 각자의 쿨타임이 따로 존재한다.
+# 2. 보스를 잡으면서 진행, 보스를 잡을 때마다 레벨이 오름 (최대 체력 추가)
+# 3. 보스를 잡을 때마다 저장 가능
+# 4. boshy: : 총알 발사(최대 4발), 자동 장전
 
 ## 해야할 일
 # 0. 버그 수정(중요)
@@ -22,6 +19,9 @@
 # 2. 낮점 추가
 # 3. 스킬 추가
 # 4. 스토리 추가
+# 5. 하드코어 모드 추가
+# 6. 이스터에그 추가
+# 7. 3단점프 기믹 추가
 
 # 게임 이미지
 # 배경 : 640 * 480 (가로 세로) - M_background.png
@@ -143,6 +143,7 @@ while running:
     # 2. 이벤트 처리 (키보드, 마우스 등)
     for event in pygame.event.get(): 
         if event.type == pygame.QUIT: # 창을 닫았을 때
+            # 저장 후 종료하시겠습니까? 창 띄우기
             running = False 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
@@ -241,6 +242,8 @@ while running:
         bullet_rect.left = bullet_pos_x
         bullet_rect.top = bullet_pos_y
 
+        bullet_val["pos_x"] += bullet_val["to_x"] # 총알 이동
+
         if bullet_rect.colliderect(enemy_slime_rect): # 총알과 슬라임이 충돌
             Slime = False
             character_boshy_Exp += 10
@@ -249,17 +252,15 @@ while running:
             break
         elif bullet_pos_x < 0 or bullet_pos_x > screen_width - bullet_width: # 가로벽에 닿았을 때
             bullet_to_remove = bullet_img_idx
-        else:
-            bullet_val["pos_x"] += bullet_val["to_x"] # 총알 이동
-
+            
         if bullet_to_remove > -1: # bullet_to_remove의 최초값은 -1
-            if bullet_to_remove == 0:
+            if bullet_to_remove == 0: # 1번 총알을 제거해야할 때
                 bullet_1_using = False               
-            elif bullet_to_remove == 1:
+            elif bullet_to_remove == 1: # 2번 총알을 제거해야 할 때
                 if bullet_1_using == True:
                     break
-                else:
-                    bullet_not_using += 1
+                else: # 1번이 사용되고있지 않다면
+                    bullet_not_using += 1 # bullet_not_using + 1
                 bullet_2_using = False
             elif bullet_to_remove == 2:
                 if bullet_1_using == True:
@@ -284,7 +285,7 @@ while running:
                 else:
                     bullet_not_using += 1
                 bullet_4_using = False # 총알을 다시 사용가능하게 함
-            del bullets[bullet_to_remove - bullet_not_using] # 사용된 총알 제거 // ******총알을 2발이상 발사할 시 이 줄에서 문제 발생 
+            del bullets[bullet_to_remove - bullet_not_using] # 사용된 총알 제거 / index 문제는 해결 but 총알이 공중에서 멈춤
             bullet_to_remove = -1 # 변수값 초기화
             bullet_not_using = 0
 
@@ -360,6 +361,7 @@ while running:
             screen.blit(character_boshy_LEFT, (character_boshy_x_pos, character_boshy_y_pos))
         else:
             screen.blit(character_boshy, (character_boshy_x_pos, character_boshy_y_pos))
+    
     if Slime == True:
         screen.blit(enemy_slime, (enemy_slime_x_pos, enemy_slime_y_pos))
 
