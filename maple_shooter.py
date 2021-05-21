@@ -271,6 +271,7 @@ while running:
                     break
                 else:
                     bullet_not_using += 1
+                bullet_3_using = False
             else:
                 if bullet_1_using == True:
                     break
