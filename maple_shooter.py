@@ -1,4 +1,3 @@
-
 ## 게임 조건
 ####### 이 버전엔 버그 있음
 # 0. 더 좋은 조건이 있다면 추가나 수정 바람
@@ -252,7 +251,7 @@ while running:
             break
         elif bullet_pos_x < 0 or bullet_pos_x > screen_width - bullet_width: # 가로벽에 닿았을 때
             bullet_to_remove = bullet_img_idx
-            
+        #버그 밑의 break가 총알 정의 for문에서 빠져나오면서 버그가 생김
         if bullet_to_remove > -1: # bullet_to_remove의 최초값은 -1
             if bullet_to_remove == 0: # 1번 총알을 제거해야할 때
                 bullet_1_using = False               
@@ -286,7 +285,7 @@ while running:
                 else:
                     bullet_not_using += 1
                 bullet_4_using = False # 총알을 다시 사용가능하게 함
-            del bullets[bullet_to_remove - bullet_not_using] # 사용된 총알 제거 / index 문제는 해결 but 총알이 공중에서 멈춤
+            del bullets[bullet_to_remove - bullet_not_using] # 사용된 총알 제거 / break를 pass로 바꾸어 실행하였을때 index 오류 발생
             bullet_to_remove = -1 # 변수값 초기화
             bullet_not_using = 0
 
