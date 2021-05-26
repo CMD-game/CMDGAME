@@ -1,3 +1,4 @@
+
 ## 게임 조건
 ####### 이 버전엔 버그 있음
 # 0. 더 좋은 조건이 있다면 추가나 수정 바람
@@ -56,6 +57,8 @@ background = pygame.image.load(os.path.join(image_path, "M_background.png"))
 stage = pygame.image.load(os.path.join(image_path, "M_stage.png"))
 stage_size = stage.get_rect().size
 stage_height = stage_size[1]
+
+HP_bar = pygame.image.load(os.path.join(image_path, "HP_bar.png"))
 
 # 플랫폼은 하나가 제일 적당할 듯
 platform = pygame.image.load(os.path.join(image_path, "M_platform.png"))
@@ -247,47 +250,24 @@ while running:
             Slime = False
             character_boshy_Exp += 10
             slime_start_ticks = pygame.time.get_ticks()
-            bullet_to_remove = bullet_img_idx
-            break
+            bullet_to_remove = bullet_idx
+            pass
+
         elif bullet_pos_x < 0 or bullet_pos_x > screen_width - bullet_width: # 가로벽에 닿았을 때
-            bullet_to_remove = bullet_img_idx
-        #버그 밑의 break가 총알 정의 for문에서 빠져나오면서 버그가 생김
+            bullet_to_remove = bullet_idx
+
         if bullet_to_remove > -1: # bullet_to_remove의 최초값은 -1
-            if bullet_to_remove == 0: # 1번 총알을 제거해야할 때
-                bullet_1_using = False               
-            elif bullet_to_remove == 1: # 2번 총알을 제거해야 할 때
-                if bullet_1_using == True:
-                    break
-                else: # 1번이 사용되고있지 않다면
-                    bullet_not_using += 1 # bullet_not_using + 1
+            if bullet_img_idx == 0:
+                bullet_1_using = False
+            elif bullet_img_idx == 1:
                 bullet_2_using = False
-            elif bullet_to_remove == 2:
-                if bullet_1_using == True:
-                    break
-                else:
-                    bullet_not_using += 1
-                if bullet_2_using == True:
-                    break
-                else:
-                    bullet_not_using += 1
+            elif bullet_img_idx == 2:
                 bullet_3_using = False
-            else:
-                if bullet_1_using == True:
-                    break
-                else:
-                    bullet_not_using += 1
-                if bullet_2_using == True:
-                    break
-                else:
-                    bullet_not_using += 1
-                if bullet_3_using == True:
-                    break
-                else:
-                    bullet_not_using += 1
-                bullet_4_using = False # 총알을 다시 사용가능하게 함
-            del bullets[bullet_to_remove - bullet_not_using] # 사용된 총알 제거 / break를 pass로 바꾸어 실행하였을때 index 오류 발생
+            elif bullet_img_idx == 3:
+                bullet_4_using = False
+            del bullets[bullet_to_remove] # 사용된 총알 제거 / index 문제는 해결 but 총알이 공중에서 멈춤
             bullet_to_remove = -1 # 변수값 초기화
-            bullet_not_using = 0
+
 
     if character_boshy_rect.colliderect(platform_rect): # 플랫폼 착지
         if (character_boshy_y_pos + character_boshy_height - 10) <= platform_y_pos and airborne_distance >= 0:
