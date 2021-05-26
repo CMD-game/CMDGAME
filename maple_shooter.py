@@ -8,9 +8,9 @@
 # 4. boshy: : 총알 발사(최대 4발), 자동 장전
 
 ## 해야할 일
-# 0. 버그 수정(중요)
-# 1. 저장, 불러오기 기능 추가
-# 2. 체력 시스템 정비
+# 0. 버그 수정(중요) clear
+# 1. 저장, 불러오기 기능 추가 -> 하드코어 clear
+# 2. 체력 시스템 정비 clear
 # 3. 튜토리얼 만들기
 # 4. 보스 추가
 
@@ -19,9 +19,10 @@
 # 2. 낮점 추가
 # 3. 스킬 추가
 # 4. 스토리 추가
-# 5. 하드코어 모드 추가
+# 5. 하드코어 모드 추가?
 # 6. 이스터에그 추가
 # 7. 3단점프 기믹 추가
+# 8. 해상도 변경 기능 / 키 변경 기능 추가
 
 # 게임 이미지
 # 배경 : 640 * 480 (가로 세로) - M_background.png
@@ -54,6 +55,7 @@ current_path = os.path.dirname(__file__) #현재 파일의 위치 반환
 image_path = os.path.join(current_path, "images") #images 폴더 위치 반환
 
 background = pygame.image.load(os.path.join(image_path, "M_background.png"))
+Game_over = pygame.image.load(os.path.join(image_path, "Game_over.png"))
 stage = pygame.image.load(os.path.join(image_path, "M_stage.png"))
 stage_size = stage.get_rect().size
 stage_height = stage_size[1]
@@ -75,11 +77,11 @@ character_boshy_x_pos = (screen_width - character_boshy_width)/ 2
 character_boshy_y_pos = screen_height - character_boshy_height - stage_height
 
 character_boshy_speed = 0.3
-character_boshy_HP = 100
+character_boshy_HP = 5
 character_boshy_Exp = 0
 character_boshy_Level = 1
 MAX_Exp = 100
-MAX_HP = 100
+MAX_HP = 5
 invincibility = 0
 
 character_boshy_to_x_LEFT = 0
@@ -108,7 +110,9 @@ bullet_speed = 10
 bullet_LEFT = 1
 bullet_number = 1
 
-bullets = []
+bullets = [
+
+]
 
 # 사라질 총알 저장 변수
 bullet_to_remove = -1
@@ -124,7 +128,7 @@ enemy_slime_Exp = 10
 enemy_slime_regen = 1000 # 실제 리젠 시간
 enemy_slime_regen_time = 0 # 리젠 시간을 재기 위한 변수(0으로 고정)
 
-enemy_slime_attack = 5
+enemy_attack = 1
 
 # 필수
 game_font = pygame.font.Font(None, 40) 
@@ -285,7 +289,6 @@ while running:
         character_boshy_Exp -= MAX_Exp
         character_boshy_Level += 1
         MAX_Exp += MAX_Exp * 0.1 # MAX Exp, Hp 는 모두 1.1배 
-        MAX_HP += MAX_HP * 0.1
         character_boshy_HP = MAX_HP # 레벨업시 즉시 회복
 
     if Slime == False:
@@ -298,10 +301,9 @@ while running:
 
     if invincibility == 0: # 무적이 아닐 때
         if character_boshy_rect.colliderect(enemy_slime_rect): # 캐릭터와 슬라임이 충돌
-            character_boshy_HP -= enemy_slime_attack
+            character_boshy_HP -= enemy_attack
             invincibility = 2
             if character_boshy_HP <= 0:
-                print("game over")
                 running = False
 
     if invincibility == 2:
@@ -314,7 +316,7 @@ while running:
     # 게임 화면 표시
     HP = game_font.render("HP : {} / {}".format(int(character_boshy_HP), int(MAX_HP)), True, (255, 0, 0))
     Exp = game_font.render("Exp : {} / {}".format(int(character_boshy_Exp), int(MAX_Exp)), True, (255, 255, 0))
-    Level = game_font.render("Lv.{}".format(int(character_boshy_Level)), True, (0, 255, 0))
+    Level = game_font.render("Lv.{}".format(int(character_boshy_Level)), True, (255, 255, 0))
 
     # 5. 화면에 그리기
     screen.blit(background, (0, 0))
@@ -344,6 +346,9 @@ while running:
     
     if Slime == True:
         screen.blit(enemy_slime, (enemy_slime_x_pos, enemy_slime_y_pos))
+    
+    for i in range(1, character_boshy_HP+1):
+        screen.blit(HP_bar, (screen_width - 30*i - 12, 10))
 
     for idx, val in enumerate(bullets): # 모든 총알에 대해 정보를 불러와 그리기
         bullet_pos_x = val["pos_x"]
@@ -351,9 +356,9 @@ while running:
         bullet_img_idx = val["img_idx"]
         screen.blit(bullet_images[bullet_img_idx], (bullet_pos_x, bullet_pos_y))
 
-    screen.blit(HP, ((screen_width - 200), 10))
-    screen.blit(Exp, ((screen_width - 500), 10))
     screen.blit(Level, (10, 10))
     pygame.display.update() 
 
-pygame.quit()
+screen.blit(Game_over, (0, 0))
+pygame.display.update()
+# 몇초 기다리기 -> 꺼짐
