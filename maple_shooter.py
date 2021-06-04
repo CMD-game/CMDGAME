@@ -118,17 +118,31 @@ bullets = [
 bullet_to_remove = -1
 bullet_not_using = 0
 
+# 튜토리얼 슬라임 정보
 enemy_slime = pygame.image.load(os.path.join(image_path, "M_enemy_slime.png"))
 enemy_slime_size = enemy_slime.get_rect().size
 enemy_slime_width = enemy_slime_size[0]
 enemy_slime_height = enemy_slime_size[1]
-enemy_slime_x_pos = 0
+enemy_slime_x_pos = -1000
 enemy_slime_y_pos = screen_height - enemy_slime_height - stage_height
 enemy_slime_Exp = 10
 enemy_slime_regen = 1000 # 실제 리젠 시간
 enemy_slime_regen_time = 0 # 리젠 시간을 재기 위한 변수(0으로 고정)
+enemy_slime_using = True
+Slime = True
+enemy_slime_attack = 1
 
-enemy_attack = 1
+# 보스1_레온?
+enemy_Leon = pygame.image.load(os.path.join(image_path, "Leon.png"))
+enemy_Leon_size = enemy_Leon.get_rect().size
+enemy_Leon_width = enemy_Leon_size[0]
+enemy_Leon_height = enemy_Leon_size[1]
+enemy_Leon_x_pos = 0
+enemy_Leon_y_pos = screen_height - enemy_Leon_height - stage_height
+enemy_Leon_Exp = 1000 # 체크용
+enemy_Leon_attack = 1
+enemy_Leon_HP = 200
+enemy_Leon_using = False
 
 # 필수
 game_font = pygame.font.Font(None, 40) 
@@ -136,7 +150,6 @@ total_time = 0
 start_ticks = pygame.time.get_ticks()
 
 running = True
-Slime = True 
 airborne = False # 공중에 떠 있는지 확인하기 위한 변수
 double_jump = True # 더블점프가 가능한지 확인하기 위한 변수
 jump_height = -10 # 점프 시작시 속도
@@ -200,6 +213,11 @@ while running:
                         "pos_y" : bullet_y_pos,
                         "img_idx" : bullet_number,
                         "to_x" : bullet_speed * bullet_LEFT }) # 딕셔너리를 이용함, 중괄호 안의 수치는 변경 가능
+            elif event.key == pygame.K_n:
+                enemy_slime_using = False
+                Slime = False
+                enemy_Leon_using = True
+
         
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
@@ -234,6 +252,10 @@ while running:
     enemy_slime_rect.left = enemy_slime_x_pos
     enemy_slime_rect.top = enemy_slime_y_pos
 
+    enemy_Leon_rect = enemy_Leon.get_rect()
+    enemy_Leon_rect.left = enemy_Leon_x_pos
+    enemy_Leon_rect.top = enemy_Leon_y_pos
+
     platform_rect = platform.get_rect()
     platform_rect.left = platform_x_pos
     platform_rect.top = platform_y_pos
@@ -251,13 +273,19 @@ while running:
         bullet_val["pos_x"] += bullet_val["to_x"] # 총알 이동
 
         if bullet_rect.colliderect(enemy_slime_rect): # 총알과 슬라임이 충돌
-            Slime = False
+            enemy_slime_using = False
             character_boshy_Exp += 10
             slime_start_ticks = pygame.time.get_ticks()
             bullet_to_remove = bullet_idx
-            pass
 
         elif bullet_pos_x < 0 or bullet_pos_x > screen_width - bullet_width: # 가로벽에 닿았을 때
+            bullet_to_remove = bullet_idx
+
+        elif bullet_rect.colliderect(enemy_Leon_rect):
+            enemy_Leon_HP -= 1
+            if enemy_Leon_HP <= 0:
+                enemy_Leon_using = False
+                character_boshy_Exp += enemy_Leon_Exp
             bullet_to_remove = bullet_idx
 
         if bullet_to_remove > -1: # bullet_to_remove의 최초값은 -1
@@ -291,17 +319,24 @@ while running:
         MAX_Exp += MAX_Exp * 0.1 # MAX Exp, Hp 는 모두 1.1배 
         character_boshy_HP = MAX_HP # 레벨업시 즉시 회복
 
-    if Slime == False:
+    if enemy_slime_using == False:
         enemy_slime_x_pos = -1000
-        if (pygame.time.get_ticks() - slime_start_ticks) - enemy_slime_regen_time >= enemy_slime_regen:
-            Slime = True
+        if Slime == True:
+            if (pygame.time.get_ticks() - slime_start_ticks) - enemy_slime_regen_time >= enemy_slime_regen:
+                enemy_slime_using = True
 
-    if Slime == True:
+    if enemy_slime_using == True:
         enemy_slime_x_pos = 0
+    
+    
+    if enemy_Leon_using == True:
+        enemy_Leon_x_pos = 0
+    else:
+        enemy_Leon_x_pos = -1000
 
     if invincibility == 0: # 무적이 아닐 때
         if character_boshy_rect.colliderect(enemy_slime_rect): # 캐릭터와 슬라임이 충돌
-            character_boshy_HP -= enemy_attack
+            character_boshy_HP -= enemy_slime_attack
             invincibility = 2
             if character_boshy_HP <= 0:
                 running = False
@@ -344,8 +379,11 @@ while running:
         else:
             screen.blit(character_boshy, (character_boshy_x_pos, character_boshy_y_pos))
     
-    if Slime == True:
+    if enemy_slime_using == True:
         screen.blit(enemy_slime, (enemy_slime_x_pos, enemy_slime_y_pos))
+
+    if enemy_Leon_using == True:
+        screen.blit(enemy_Leon, (enemy_Leon_x_pos, enemy_Leon_y_pos))
     
     for i in range(1, character_boshy_HP+1):
         screen.blit(HP_bar, (screen_width - 30*i - 12, 10))
