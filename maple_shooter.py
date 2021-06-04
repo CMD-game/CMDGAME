@@ -340,6 +340,11 @@ while running:
             invincibility = 2
             if character_boshy_HP <= 0:
                 running = False
+        elif character_boshy_rect.colliderect(enemy_Leon_rect):
+            character_boshy_HP -= enemy_Leon_attack
+            invincibility = 2
+            if character_boshy_HP <= 0:
+                running = False
 
     if invincibility == 2:
         invincibility_time = pygame.time.get_ticks() - start_ticks
@@ -349,8 +354,6 @@ while running:
             invincibility = 0
 
     # 게임 화면 표시
-    HP = game_font.render("HP : {} / {}".format(int(character_boshy_HP), int(MAX_HP)), True, (255, 0, 0))
-    Exp = game_font.render("Exp : {} / {}".format(int(character_boshy_Exp), int(MAX_Exp)), True, (255, 255, 0))
     Level = game_font.render("Lv.{}".format(int(character_boshy_Level)), True, (255, 255, 0))
 
     # 5. 화면에 그리기
@@ -385,7 +388,7 @@ while running:
     if enemy_Leon_using == True:
         screen.blit(enemy_Leon, (enemy_Leon_x_pos, enemy_Leon_y_pos))
     
-    for i in range(1, character_boshy_HP+1):
+    for i in range(1, character_boshy_HP+1): # range 범위 : 이상 미만
         screen.blit(HP_bar, (screen_width - 30*i - 12, 10))
 
     for idx, val in enumerate(bullets): # 모든 총알에 대해 정보를 불러와 그리기
