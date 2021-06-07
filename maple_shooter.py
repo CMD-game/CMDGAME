@@ -29,6 +29,7 @@
 # 캐릭터 : 50 * 100 - M_character_boshy.png
 # 적 : 50 * 50 - M_enemy.png
 
+from typing import Pattern
 import pygame
 import time
 import os #파일위치 반환을 위한 라이브러리
@@ -60,7 +61,8 @@ stage = pygame.image.load(os.path.join(image_path, "M_stage.png"))
 stage_size = stage.get_rect().size
 stage_height = stage_size[1]
 
-HP_bar = pygame.image.load(os.path.join(image_path, "HP_bar.png"))
+character_HP_bar = pygame.image.load(os.path.join(image_path, "HP_bar.png"))
+Leon_HP_bar = pygame.image.load(os.path.join(image_path, "Leon_HP_bar.png"))
 
 # 플랫폼은 하나가 제일 적당할 듯
 platform = pygame.image.load(os.path.join(image_path, "M_platform.png"))
@@ -134,20 +136,29 @@ enemy_slime_attack = 1
 
 # 보스1_레온?
 enemy_Leon = pygame.image.load(os.path.join(image_path, "Leon.png"))
+enemy_Leon_pattern_1_ready = pygame.image.load(os.path.join(image_path, "Leon_pattern_1_ready.png"))
+enemy_Leon_pattern_1_ready_time = 1000 #ms
+enemy_Leon_pattern_1 = pygame.image.load(os.path.join(image_path, "Leon_pattern_1.png"))
+
+enemy_Leon_pattern_1_time = enemy_Leon_pattern_1_ready_time + 1000
 enemy_Leon_size = enemy_Leon.get_rect().size
 enemy_Leon_width = enemy_Leon_size[0]
 enemy_Leon_height = enemy_Leon_size[1]
 enemy_Leon_x_pos = 0
 enemy_Leon_y_pos = screen_height - enemy_Leon_height - stage_height
 enemy_Leon_Exp = 1000 # 체크용
+enemy_Leon_pattern_1_x_pos = -1000
+enemy_Leon_pattern_1_y_pos = screen_height - stage_height - 80
 enemy_Leon_attack = 1
 enemy_Leon_HP = 200
 enemy_Leon_using = False
+enemy_Leon_pattern = 1
 
 # 필수
 game_font = pygame.font.Font(None, 40) 
 total_time = 0
 start_ticks = pygame.time.get_ticks()
+pattern_start_time = 0
 
 running = True
 airborne = False # 공중에 떠 있는지 확인하기 위한 변수
@@ -241,6 +252,23 @@ while running:
         character_boshy_x_pos = 0
     if character_boshy_x_pos > screen_width - character_boshy_width:
         character_boshy_x_pos = screen_width - character_boshy_width
+
+    if enemy_Leon_using == True and enemy_Leon_pattern == 1:
+        pattern_start_time = pygame.time.get_ticks()
+        enemy_Leon_pattern = 11
+
+    if enemy_Leon_using == True and enemy_Leon_pattern == 11:
+        if pygame.time.get_ticks() - pattern_start_time >= enemy_Leon_pattern_1_ready_time:
+            enemy_Leon_pattern = 12
+
+    if enemy_Leon_using == True and enemy_Leon_pattern == 12:
+        enemy_Leon_pattern_1_x_pos = enemy_Leon_width
+        if pygame.time.get_ticks() - pattern_start_time >= enemy_Leon_pattern_1_time:
+            enemy_Leon_pattern = 2
+            enemy_Leon_pattern_1_x_pos = -1000
+
+    if enemy_Leon_pattern == 2:
+        enemy_Leon_pattern = 1
         
     # 4. 충돌 처리 
     # 필수 (캐릭터 크기를 재는 함수들)
@@ -259,6 +287,10 @@ while running:
     platform_rect = platform.get_rect()
     platform_rect.left = platform_x_pos
     platform_rect.top = platform_y_pos
+    
+    enemy_Leon_pattern_1_rect = enemy_Leon_pattern_1.get_rect()
+    enemy_Leon_pattern_1_rect.left = enemy_Leon_pattern_1_x_pos
+    enemy_Leon_pattern_1_rect.top = enemy_Leon_pattern_1_y_pos
 
     # 총알 위치 정의
     for bullet_idx, bullet_val in enumerate(bullets):
@@ -328,11 +360,11 @@ while running:
     if enemy_slime_using == True:
         enemy_slime_x_pos = 0
     
-    
     if enemy_Leon_using == True:
         enemy_Leon_x_pos = 0
     else:
         enemy_Leon_x_pos = -1000
+        enemy_Leon_pattern_1_x_pos = -1000
 
     if invincibility == 0: # 무적이 아닐 때
         if character_boshy_rect.colliderect(enemy_slime_rect): # 캐릭터와 슬라임이 충돌
@@ -340,7 +372,7 @@ while running:
             invincibility = 2
             if character_boshy_HP <= 0:
                 running = False
-        elif character_boshy_rect.colliderect(enemy_Leon_rect):
+        elif character_boshy_rect.colliderect(enemy_Leon_rect) or character_boshy_rect.colliderect(enemy_Leon_pattern_1_rect):
             character_boshy_HP -= enemy_Leon_attack
             invincibility = 2
             if character_boshy_HP <= 0:
@@ -360,6 +392,10 @@ while running:
     screen.blit(background, (0, 0))
     screen.blit(stage, (0, (screen_height - stage_height))) 
     screen.blit(platform, (platform_x_pos, platform_y_pos))
+    if enemy_Leon_using == True and enemy_Leon_pattern == 11:
+        screen.blit(enemy_Leon_pattern_1_ready, (enemy_Leon_width, enemy_Leon_pattern_1_y_pos))
+    if enemy_Leon_using == True and enemy_Leon_pattern == 12:
+        screen.blit(enemy_Leon_pattern_1, (enemy_Leon_pattern_1_x_pos, enemy_Leon_pattern_1_y_pos))
     if invincibility == True: # 무적 시간에 깜빡임 구현 (더 나은 방안이 있으면 수정 바람)
         if int((pygame.time.get_ticks() - start_ticks - invincibility_time) / 250) % 2 == 0:
             pass
@@ -389,7 +425,11 @@ while running:
         screen.blit(enemy_Leon, (enemy_Leon_x_pos, enemy_Leon_y_pos))
     
     for i in range(1, character_boshy_HP+1): # range 범위 : 이상 미만
-        screen.blit(HP_bar, (screen_width - 30*i - 12, 10))
+        screen.blit(character_HP_bar, (screen_width - 30*i - 12, 10))
+
+    if enemy_Leon_using == True:
+        for i in range(1, enemy_Leon_HP+1):
+            screen.blit(Leon_HP_bar, (3*i -3, 0))
 
     for idx, val in enumerate(bullets): # 모든 총알에 대해 정보를 불러와 그리기
         bullet_pos_x = val["pos_x"]
