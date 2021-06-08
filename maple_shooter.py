@@ -29,7 +29,6 @@
 # 캐릭터 : 50 * 100 - M_character_boshy.png
 # 적 : 50 * 50 - M_enemy.png
 
-from typing import Pattern
 import pygame
 import time
 import os #파일위치 반환을 위한 라이브러리
@@ -44,7 +43,7 @@ screen_height = 480 # 세로 크기
 screen = pygame.display.set_mode((screen_width, screen_height))
 
 # 화면 타이틀 설정
-pygame.display.set_caption("boss_killer")
+pygame.display.set_caption("untitled")
 
 # FPS(초당 프레임)
 clock = pygame.time.Clock()
