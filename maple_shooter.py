@@ -118,6 +118,8 @@ bullets = [
 
 ]
 
+event_attack = 0
+event_attack_end_time = 0
 # 사라질 총알 저장 변수
 bullet_to_remove = -1
 bullet_not_using = 0
@@ -212,35 +214,7 @@ while running:
                 airborne = True
                 airborne_distance = 5 # 하향점프의 처음 속도는 5
             elif event.key == pygame.K_a: # a키를 누름 : 공격
-                try: # try/except/else 구문 : try에서 error가 발생하면 except, 아니면 else 실행
-                    if bullet_1_using == False: # 총알 사용 여부 확인
-                        bullet_1_using = True
-                        bullet_number = 0
-                    elif bullet_2_using == False:
-                        bullet_2_using = True
-                        bullet_number = 1
-                    elif bullet_3_using == False:
-                        bullet_3_using = True
-                        bullet_number = 2
-                    elif bullet_4_using == False:
-                        bullet_4_using = True
-                        bullet_number = 3
-                    else: # 모든 총알이 사용중일 때 a를 누르면 고의로 에러 발생
-                        print(5/0)
-                except ZeroDivisionError: # 에러가 나면 break
-                    break
-                else: # 아니면 총알의 정보를 수집해 저장
-                    bullet_x_pos = character_boshy_x_pos + (character_boshy_width - bullet_width) / 2
-                    bullet_y_pos = character_boshy_y_pos + 10
-                    if character_boshy_to_x_LEFT_press == 1: # 왼쪽을 보고 있다면 to_x의 부호 반대
-                        bullet_LEFT = -1
-                    else:
-                        bullet_LEFT = 1
-                    bullets.append({
-                        "pos_x" : bullet_x_pos, 
-                        "pos_y" : bullet_y_pos,
-                        "img_idx" : bullet_number,
-                        "to_x" : bullet_speed * bullet_LEFT }) # 딕셔너리를 이용함, 중괄호 안의 수치는 변경 가능
+                event_attack = 1
             elif event.key == pygame.K_n:
                 if enemy_Leon_HP >= 1:
                     enemy_slime_using = False
@@ -254,6 +228,40 @@ while running:
                 character_boshy_to_x_LEFT = 0
             elif event.key == pygame.K_RIGHT:
                 character_boshy_to_x_RIGHT = 0
+            elif event.key == pygame.K_a:
+                event_attack = 0
+    if event_attack == 1:
+        if pygame.time.get_ticks() - event_attack_end_time >= 125:
+            try: # try/except/else 구문 : try에서 error가 발생하면 except, 아니면 else 실행
+                if bullet_1_using == False: # 총알 사용 여부 확인
+                    bullet_1_using = True
+                    bullet_number = 0
+                elif bullet_2_using == False:
+                        bullet_2_using = True
+                        bullet_number = 1
+                elif bullet_3_using == False:
+                        bullet_3_using = True
+                        bullet_number = 2
+                elif bullet_4_using == False:
+                        bullet_4_using = True
+                        bullet_number = 3
+                else: # 모든 총알이 사용중일 때 a를 누르면 고의로 에러 발생
+                    print(5/0)
+            except ZeroDivisionError: # 에러가 나면 break
+                pass
+            else: # 아니면 총알의 정보를 수집해 저장
+                bullet_x_pos = character_boshy_x_pos + (character_boshy_width - bullet_width) / 2
+                bullet_y_pos = character_boshy_y_pos + 10
+                if character_boshy_to_x_LEFT_press == 1: # 왼쪽을 보고 있다면 to_x의 부호 반대
+                    bullet_LEFT = -1
+                else:
+                    bullet_LEFT = 1
+                bullets.append({
+                    "pos_x" : bullet_x_pos, 
+                    "pos_y" : bullet_y_pos,
+                    "img_idx" : bullet_number,
+                    "to_x" : bullet_speed * bullet_LEFT }) # 딕셔너리를 이용함, 중괄호 안의 수치는 변경 가능
+                event_attack_end_time = pygame.time.get_ticks()
 
     if airborne == True: # 점프
         character_boshy_y_pos += airborne_distance # 캐릭터가 점프 속도만큼 이동
@@ -360,6 +368,8 @@ while running:
             enemy_Leon_HP -= 1
             if enemy_Leon_HP <= 0:
                 enemy_Leon_using = False
+                enemy_Leon_pattern_1_x_pos = -1000
+                enemy_Leon_pattern_2_x_pos = -1000
                 character_boshy_Exp += enemy_Leon_Exp
             bullet_to_remove = bullet_idx
         
