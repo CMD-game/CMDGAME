@@ -125,53 +125,54 @@ bullet_to_remove = -1
 bullet_not_using = 0
 
 # 튜토리얼 슬라임 정보
-enemy_slime = pygame.image.load(os.path.join(image_path, "M_enemy_slime.png"))
-enemy_slime_size = enemy_slime.get_rect().size
-enemy_slime_width = enemy_slime_size[0]
-enemy_slime_height = enemy_slime_size[1]
-enemy_slime_x_pos = -1000
-enemy_slime_y_pos = screen_height - enemy_slime_height - stage_height
-enemy_slime_regen = 1000 # 실제 리젠 시간
-enemy_slime_regen_time = 0 # 리젠 시간을 재기 위한 변수(0으로 고정)
-enemy_slime_using = True
+slime = pygame.image.load(os.path.join(image_path, "M_slime.png"))
+slime_size = slime.get_rect().size
+slime_width = slime_size[0]
+slime_height = slime_size[1]
+slime_x_pos = -1000
+slime_y_pos = screen_height - slime_height - stage_height
+slime_regen = 1000 # 실제 리젠 시간
+slime_regen_time = 0 # 리젠 시간을 재기 위한 변수(0으로 고정)
+slime_using = True
 Slime = True
-enemy_slime_attack = 1
+slime_attack = 1
 
 # 보스1 - 레온
-enemy_Leon = pygame.image.load(os.path.join(image_path, "Leon.png"))
-enemy_Leon_pattern_1_ready = pygame.image.load(os.path.join(image_path, "Leon_pattern_1_ready.png"))
-enemy_Leon_pattern_1_ready_time = 1000 #ms
-enemy_Leon_pattern_1 = pygame.image.load(os.path.join(image_path, "Leon_pattern_1.png"))
-enemy_Leon_pattern_1_time = enemy_Leon_pattern_1_ready_time + 1000
-delay_time = enemy_Leon_pattern_1_time + 1000
-enemy_Leon_pattern_2_ready = pygame.image.load(os.path.join(image_path, "Leon_pattern_2_ready.png"))
-enemy_Leon_pattern_2_ready_time = 1000
-enemy_Leon_pattern_2 = pygame.image.load(os.path.join(image_path, "Leon_pattern_2.png"))
-enemy_Leon_pattern_2_time = enemy_Leon_pattern_2_ready_time + 1000
-enemy_Leon_size = enemy_Leon.get_rect().size
-enemy_Leon_width = enemy_Leon_size[0]
-enemy_Leon_height = enemy_Leon_size[1]
-enemy_Leon_x_pos = 0
-enemy_Leon_y_pos = screen_height - enemy_Leon_height - stage_height
-enemy_Leon_Exp = 100
-enemy_Leon_pattern_1_x_pos = -1000
-enemy_Leon_pattern_1_y_pos = screen_height - stage_height - 80
-enemy_Leon_pattern_2_x_pos = -1000
-enemy_Leon_pattern_2_y_pos = platform_y_pos - 100
-enemy_Leon_attack = 1
-enemy_Leon_HP = 200
-enemy_Leon_using = False
-enemy_Leon_pattern = 1
+Leon = pygame.image.load(os.path.join(image_path, "Leon.png"))
+Leon_pattern_1_ready = pygame.image.load(os.path.join(image_path, "Leon_pattern_1_ready.png"))
+Leon_pattern_1_ready_time = 1000 #ms
+Leon_pattern_1 = pygame.image.load(os.path.join(image_path, "Leon_pattern_1.png"))
+Leon_pattern_1_time = Leon_pattern_1_ready_time + 1000
+delay_time = Leon_pattern_1_time + 1000
+Leon_pattern_2_ready = pygame.image.load(os.path.join(image_path, "Leon_pattern_2_ready.png"))
+Leon_pattern_2_ready_time = 1000
+Leon_pattern_2 = pygame.image.load(os.path.join(image_path, "Leon_pattern_2.png"))
+Leon_pattern_2_time = Leon_pattern_2_ready_time + 1000
+Leon_size = Leon.get_rect().size
+Leon_width = Leon_size[0]
+Leon_height = Leon_size[1]
+Leon_x_pos = 0
+Leon_y_pos = screen_height - Leon_height - stage_height
+Leon_Exp = 100
+Leon_pattern_1_x_pos = -1000
+Leon_pattern_1_y_pos = screen_height - stage_height - 80
+Leon_pattern_2_x_pos = -1000
+Leon_pattern_2_y_pos = platform_y_pos - 100
+Leon_attack = 1
+Leon_HP = 200
+Leon_using = False
+Leon_pattern = 1
 
 #보스2 - untitled
-enemy_untitled = pygame.image.load(os.path.join(image_path, "untitled.png"))
-enemy_untitled_size = enemy_untitled.get_rect().size
-enemy_untitled_width = enemy_untitled_size[0]
-enemy_untitled_height = enemy_untitled_size[1]
-enemy_untitled_HP = 900 # 300 * 3phase
-enemy_untitled_x_pos = 0
-enemy_untitled_y_pos = 0
-enemy_untitled_using = False
+untitled = pygame.image.load(os.path.join(image_path, "untitled.png"))
+untitled_size = untitled.get_rect().size
+untitled_width = untitled_size[0]
+untitled_height = untitled_size[1]
+untitled_HP = 900 # 300 * 3phase
+untitled_phase = 1
+untitled_x_pos = -1000
+untitled_y_pos = 0
+untitled_using = False
 
 # 필수
 game_font = pygame.font.Font(None, 40) 
@@ -216,12 +217,13 @@ while running:
             elif event.key == pygame.K_a: # a키를 누름 : 공격
                 event_attack = 1
             elif event.key == pygame.K_n:
-                if enemy_Leon_HP >= 1:
-                    enemy_slime_using = False
+                if Leon_HP >= 1:
+                    slime_using = False
                     Slime = False
-                    enemy_Leon_using = True
-                elif enemy_untitled_HP >= 1:
-                    enemy_untitled_using = True
+                    Leon_using = True
+                elif untitled_HP >= 1:
+                    untitled_using = True
+                    untitled_x_pos = 0
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
@@ -280,42 +282,45 @@ while running:
     if character_boshy_x_pos > screen_width - character_boshy_width:
         character_boshy_x_pos = screen_width - character_boshy_width
 
-    if enemy_Leon_using == True:
-        if enemy_Leon_pattern == 1:
+    if Leon_using == True:
+        if Leon_pattern == 1:
             pattern_start_time = pygame.time.get_ticks()
-            enemy_Leon_pattern = 11
+            Leon_pattern = 11
 
-        if enemy_Leon_pattern == 11:
-            if pygame.time.get_ticks() - pattern_start_time >= enemy_Leon_pattern_1_ready_time:
-                enemy_Leon_pattern = 12
+        if Leon_pattern == 11:
+            if pygame.time.get_ticks() - pattern_start_time >= Leon_pattern_1_ready_time:
+                Leon_pattern = 12
 
-        if enemy_Leon_pattern == 12:
-            enemy_Leon_pattern_1_x_pos = enemy_Leon_width
-            if pygame.time.get_ticks() - pattern_start_time >= enemy_Leon_pattern_1_time:
-                enemy_Leon_pattern = 13
-                enemy_Leon_pattern_1_x_pos = -1000
+        if Leon_pattern == 12:
+            Leon_pattern_1_x_pos = Leon_width
+            if pygame.time.get_ticks() - pattern_start_time >= Leon_pattern_1_time:
+                Leon_pattern = 13
+                Leon_pattern_1_x_pos = -1000
 
-        if enemy_Leon_pattern == 13:
+        if Leon_pattern == 13:
             if pygame.time.get_ticks() - pattern_start_time >= delay_time:
-                enemy_Leon_pattern = 2
+                Leon_pattern = 2
 
-        if enemy_Leon_pattern == 2:
+        if Leon_pattern == 2:
             pattern_start_time = pygame.time.get_ticks()
-            enemy_Leon_pattern = 21
+            Leon_pattern = 21
         
-        if enemy_Leon_pattern == 21:
-            if pygame.time.get_ticks() - pattern_start_time >= enemy_Leon_pattern_2_ready_time:
-                enemy_Leon_pattern = 22
+        if Leon_pattern == 21:
+            if pygame.time.get_ticks() - pattern_start_time >= Leon_pattern_2_ready_time:
+                Leon_pattern = 22
 
-        if enemy_Leon_pattern == 22:
-            enemy_Leon_pattern_2_x_pos = platform_x_pos
-            if pygame.time.get_ticks() - pattern_start_time >= enemy_Leon_pattern_1_time:
-                enemy_Leon_pattern = 23
-                enemy_Leon_pattern_2_x_pos = -1000
+        if Leon_pattern == 22:
+            Leon_pattern_2_x_pos = platform_x_pos
+            if pygame.time.get_ticks() - pattern_start_time >= Leon_pattern_1_time:
+                Leon_pattern = 23
+                Leon_pattern_2_x_pos = -1000
         
-        if enemy_Leon_pattern == 23:
+        if Leon_pattern == 23:
             if pygame.time.get_ticks() - pattern_start_time >= delay_time:
-                enemy_Leon_pattern = 1
+                Leon_pattern = 1
+
+    if untitled_using == True:
+        pass # 패턴 설계중
 
     # 4. 충돌 처리 
     # 필수 (캐릭터 크기를 재는 함수들)
@@ -323,26 +328,26 @@ while running:
     character_boshy_rect.left = character_boshy_x_pos
     character_boshy_rect.top = character_boshy_y_pos
 
-    enemy_slime_rect = enemy_slime.get_rect()
-    enemy_slime_rect.left = enemy_slime_x_pos
-    enemy_slime_rect.top = enemy_slime_y_pos
-    enemy_Leon_rect = enemy_Leon.get_rect()
-    enemy_Leon_rect.left = enemy_Leon_x_pos
-    enemy_Leon_rect.top = enemy_Leon_y_pos
-    enemy_untitled_rect = enemy_untitled.get_rect()
-    enemy_untitled_rect.left = enemy_untitled_x_pos
-    enemy_untitled_rect.top = enemy_untitled_y_pos
+    slime_rect = slime.get_rect()
+    slime_rect.left = slime_x_pos
+    slime_rect.top = slime_y_pos
+    Leon_rect = Leon.get_rect()
+    Leon_rect.left = Leon_x_pos
+    Leon_rect.top = Leon_y_pos
+    untitled_rect = untitled.get_rect()
+    untitled_rect.left = untitled_x_pos
+    untitled_rect.top = untitled_y_pos
 
     platform_rect = platform.get_rect()
     platform_rect.left = platform_x_pos
     platform_rect.top = platform_y_pos
     
-    enemy_Leon_pattern_1_rect = enemy_Leon_pattern_1.get_rect()
-    enemy_Leon_pattern_1_rect.left = enemy_Leon_pattern_1_x_pos
-    enemy_Leon_pattern_1_rect.top = enemy_Leon_pattern_1_y_pos
-    enemy_Leon_pattern_2_rect = enemy_Leon_pattern_2.get_rect()
-    enemy_Leon_pattern_2_rect.left = enemy_Leon_pattern_2_x_pos
-    enemy_Leon_pattern_2_rect.top = enemy_Leon_pattern_2_y_pos
+    Leon_pattern_1_rect = Leon_pattern_1.get_rect()
+    Leon_pattern_1_rect.left = Leon_pattern_1_x_pos
+    Leon_pattern_1_rect.top = Leon_pattern_1_y_pos
+    Leon_pattern_2_rect = Leon_pattern_2.get_rect()
+    Leon_pattern_2_rect.left = Leon_pattern_2_x_pos
+    Leon_pattern_2_rect.top = Leon_pattern_2_y_pos
 
     # 총알 위치 정의
     for bullet_idx, bullet_val in enumerate(bullets):
@@ -356,28 +361,32 @@ while running:
 
         bullet_val["pos_x"] += bullet_val["to_x"] # 총알 이동
 
-        if bullet_rect.colliderect(enemy_slime_rect): # 총알과 슬라임이 충돌
-            enemy_slime_using = False
+        if bullet_rect.colliderect(slime_rect): # 총알과 슬라임이 충돌
+            slime_using = False
             slime_start_ticks = pygame.time.get_ticks()
             bullet_to_remove = bullet_idx
 
         elif bullet_pos_x < 0 or bullet_pos_x > screen_width - bullet_width: # 가로벽에 닿았을 때
             bullet_to_remove = bullet_idx
 
-        elif bullet_rect.colliderect(enemy_Leon_rect):
-            enemy_Leon_HP -= 1
-            if enemy_Leon_HP <= 0:
-                enemy_Leon_using = False
-                enemy_Leon_pattern_1_x_pos = -1000
-                enemy_Leon_pattern_2_x_pos = -1000
-                character_boshy_Exp += enemy_Leon_Exp
+        elif bullet_rect.colliderect(Leon_rect):
+            Leon_HP -= 1
+            if Leon_HP <= 0:
+                Leon_using = False
+                Leon_pattern_1_x_pos = -1000
+                Leon_pattern_2_x_pos = -1000
+                character_boshy_Exp += Leon_Exp
             bullet_to_remove = bullet_idx
         
-        elif bullet_rect.colliderect(enemy_untitled_rect):
-            enemy_untitled_HP -= 1
-            if enemy_untitled_HP <= 0:
-                enemy_untitled_using = False
-                character_boshy_Exp += enemy_Leon_Exp
+        elif bullet_rect.colliderect(untitled_rect):
+            untitled_HP -= 1
+            if 300 < untitled_HP <= 600:
+                untitled_phase = 2
+            if 0 < untitled_HP <= 300:
+                untitled_phase = 3
+            if untitled_HP <= 0:
+                untitled_using = False
+                character_boshy_Exp += Leon_Exp
             bullet_to_remove = bullet_idx
 
         if bullet_to_remove > -1: # bullet_to_remove의 최초값은 -1
@@ -410,27 +419,27 @@ while running:
         character_boshy_Level += 1
         character_boshy_HP += 1 # 레벨업시 체력 1 증가
 
-    if enemy_slime_using == False:
-        enemy_slime_x_pos = -1000
+    if slime_using == False:
+        slime_x_pos = -1000
         if Slime == True:
-            if (pygame.time.get_ticks() - slime_start_ticks) - enemy_slime_regen_time >= enemy_slime_regen:
-                enemy_slime_using = True
+            if (pygame.time.get_ticks() - slime_start_ticks) - slime_regen_time >= slime_regen:
+                slime_using = True
 
-    if enemy_slime_using == True:
-        enemy_slime_x_pos = 0
+    if slime_using == True:
+        slime_x_pos = 0
     
-    if enemy_Leon_using == True:
-        enemy_Leon_x_pos = 0
+    if Leon_using == True:
+        Leon_x_pos = 0
     else:
-        enemy_Leon_x_pos = -1000
-        enemy_Leon_pattern_1_x_pos = -1000
+        Leon_x_pos = -1000
+        Leon_pattern_1_x_pos = -1000
 
     if invincibility == 0: # 무적이 아닐 때
-        if character_boshy_rect.colliderect(enemy_slime_rect): # 캐릭터와 슬라임이 충돌
-            character_boshy_HP -= enemy_slime_attack
+        if character_boshy_rect.colliderect(slime_rect): # 캐릭터와 슬라임이 충돌
+            character_boshy_HP -= slime_attack
             invincibility = 2
-        elif character_boshy_rect.colliderect(enemy_Leon_rect) or character_boshy_rect.colliderect(enemy_Leon_pattern_1_rect) or character_boshy_rect.colliderect(enemy_Leon_pattern_2_rect):
-            character_boshy_HP -= enemy_Leon_attack
+        elif character_boshy_rect.colliderect(Leon_rect) or character_boshy_rect.colliderect(Leon_pattern_1_rect) or character_boshy_rect.colliderect(Leon_pattern_2_rect):
+            character_boshy_HP -= Leon_attack
             invincibility = 2
         if character_boshy_HP <= 0:
             Game_over_check = 1
@@ -451,24 +460,24 @@ while running:
     screen.blit(stage, (0, (screen_height - stage_height))) 
     screen.blit(platform, (platform_x_pos, platform_y_pos))
 
-    if enemy_Leon_using == True:
-        if enemy_Leon_pattern == 11:
-            screen.blit(enemy_Leon_pattern_1_ready, (enemy_Leon_width, enemy_Leon_pattern_1_y_pos))
-        if enemy_Leon_pattern == 12:
-            screen.blit(enemy_Leon_pattern_1, (enemy_Leon_pattern_1_x_pos, enemy_Leon_pattern_1_y_pos))
-        if enemy_Leon_pattern == 21:
-            screen.blit(enemy_Leon_pattern_2_ready, (platform_x_pos, enemy_Leon_pattern_2_y_pos))
-        if enemy_Leon_pattern == 22:
-            screen.blit(enemy_Leon_pattern_2, (enemy_Leon_pattern_2_x_pos, enemy_Leon_pattern_2_y_pos))
+    if Leon_using == True:
+        if Leon_pattern == 11:
+            screen.blit(Leon_pattern_1_ready, (Leon_width, Leon_pattern_1_y_pos))
+        if Leon_pattern == 12:
+            screen.blit(Leon_pattern_1, (Leon_pattern_1_x_pos, Leon_pattern_1_y_pos))
+        if Leon_pattern == 21:
+            screen.blit(Leon_pattern_2_ready, (platform_x_pos, Leon_pattern_2_y_pos))
+        if Leon_pattern == 22:
+            screen.blit(Leon_pattern_2, (Leon_pattern_2_x_pos, Leon_pattern_2_y_pos))
     
-    if enemy_slime_using == True:
-        screen.blit(enemy_slime, (enemy_slime_x_pos, enemy_slime_y_pos))
+    if slime_using == True:
+        screen.blit(slime, (slime_x_pos, slime_y_pos))
 
-    if enemy_Leon_using == True:
-        screen.blit(enemy_Leon, (enemy_Leon_x_pos, enemy_Leon_y_pos))
+    if Leon_using == True:
+        screen.blit(Leon, (Leon_x_pos, Leon_y_pos))
 
-    if enemy_untitled_using == True:
-        screen.blit(enemy_untitled, (enemy_untitled_x_pos, enemy_untitled_y_pos))
+    if untitled_using == True:
+        screen.blit(untitled, (untitled_x_pos, untitled_y_pos))
 
     if invincibility == True: # 무적 시간에 깜빡임 구현 (더 나은 방안이 있으면 수정 바람)
         if int((pygame.time.get_ticks() - start_ticks - invincibility_time) / 250) % 2 == 0:
@@ -495,26 +504,23 @@ while running:
     for i in range(1, character_boshy_HP+1): # range 범위 : 이상 미만
         screen.blit(character_HP_bar, (screen_width - 30*i - 12, 10))
 
-    if enemy_Leon_using == True:
-        for i in range(1, enemy_Leon_HP+1):
+    if Leon_using == True:
+        for i in range(1, Leon_HP+1):
             screen.blit(Leon_HP_bar, (3*i-3, 0))
 
-    if enemy_untitled_using == True:
-        if enemy_untitled_HP == 900:
-            for i in range(1, 301):
-                screen.blit(untitled_HP_bar_3, (2*i-2, 0))
-        elif enemy_untitled_HP >= 600:
+    if untitled_using == True:
+        if untitled_phase == 1:
             for i in range(1, 301):
                 screen.blit(untitled_HP_bar_2, (2*i-2, 0))
-            for i in range(1, enemy_untitled_HP % 300 + 1):
+            for i in range(1, untitled_HP % 300 + 1):
                 screen.blit(untitled_HP_bar_3, (2*i-2, 0))
-        elif enemy_untitled_HP >= 300:
+        elif untitled_phase == 2:
             for i in range(1, 301):
                 screen.blit(untitled_HP_bar_1, (2*i-2, 0))
-            for i in range(1, enemy_untitled_HP % 300+1):
+            for i in range(1, untitled_HP % 300+1):
                 screen.blit(untitled_HP_bar_2, (2*i-2, 0))
         else:
-            for i in range(1, enemy_untitled_HP % 300+1):
+            for i in range(1, untitled_HP % 300+1):
                 screen.blit(untitled_HP_bar_1, (2*i-2, 0))
 
     for idx, val in enumerate(bullets): # 모든 총알에 대해 정보를 불러와 그리기
