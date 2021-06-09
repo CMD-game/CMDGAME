@@ -242,11 +242,11 @@ while running:
                         "img_idx" : bullet_number,
                         "to_x" : bullet_speed * bullet_LEFT }) # 딕셔너리를 이용함, 중괄호 안의 수치는 변경 가능
             elif event.key == pygame.K_n:
-                if enemy_Leon_HP == 200:
+                if enemy_Leon_HP >= 1:
                     enemy_slime_using = False
                     Slime = False
                     enemy_Leon_using = True
-                elif enemy_untitled_HP == 900:
+                elif enemy_untitled_HP >= 1:
                     enemy_untitled_using = True
 
         if event.type == pygame.KEYUP:
@@ -321,6 +321,9 @@ while running:
     enemy_Leon_rect = enemy_Leon.get_rect()
     enemy_Leon_rect.left = enemy_Leon_x_pos
     enemy_Leon_rect.top = enemy_Leon_y_pos
+    enemy_untitled_rect = enemy_untitled.get_rect()
+    enemy_untitled_rect.left = enemy_untitled_x_pos
+    enemy_untitled_rect.top = enemy_untitled_y_pos
 
     platform_rect = platform.get_rect()
     platform_rect.left = platform_x_pos
@@ -357,6 +360,13 @@ while running:
             enemy_Leon_HP -= 1
             if enemy_Leon_HP <= 0:
                 enemy_Leon_using = False
+                character_boshy_Exp += enemy_Leon_Exp
+            bullet_to_remove = bullet_idx
+        
+        elif bullet_rect.colliderect(enemy_untitled_rect):
+            enemy_untitled_HP -= 1
+            if enemy_untitled_HP <= 0:
+                enemy_untitled_using = False
                 character_boshy_Exp += enemy_Leon_Exp
             bullet_to_remove = bullet_idx
 
@@ -447,6 +457,9 @@ while running:
     if enemy_Leon_using == True:
         screen.blit(enemy_Leon, (enemy_Leon_x_pos, enemy_Leon_y_pos))
 
+    if enemy_untitled_using == True:
+        screen.blit(enemy_untitled, (enemy_untitled_x_pos, enemy_untitled_y_pos))
+
     if invincibility == True: # 무적 시간에 깜빡임 구현 (더 나은 방안이 있으면 수정 바람)
         if int((pygame.time.get_ticks() - start_ticks - invincibility_time) / 250) % 2 == 0:
             pass
@@ -477,19 +490,22 @@ while running:
             screen.blit(Leon_HP_bar, (3*i-3, 0))
 
     if enemy_untitled_using == True:
-        if enemy_untitled_HP >= 600:
+        if enemy_untitled_HP == 900:
             for i in range(1, 301):
-                screen.blit(untitled_HP_bar_2, (3*i-3, 0))
-            for i in range(1, enemy_untitled_HP % 300+1):
-                screen.blit(untitled_HP_bar_3, (3*i-3, 0))
+                screen.blit(untitled_HP_bar_3, (2*i-2, 0))
+        elif enemy_untitled_HP >= 600:
+            for i in range(1, 301):
+                screen.blit(untitled_HP_bar_2, (2*i-2, 0))
+            for i in range(1, enemy_untitled_HP % 300 + 1):
+                screen.blit(untitled_HP_bar_3, (2*i-2, 0))
         elif enemy_untitled_HP >= 300:
             for i in range(1, 301):
-                screen.blit(untitled_HP_bar_1, (3*i-3, 0))
+                screen.blit(untitled_HP_bar_1, (2*i-2, 0))
             for i in range(1, enemy_untitled_HP % 300+1):
-                screen.blit(untitled_HP_bar_2, (3*i-3, 0))
+                screen.blit(untitled_HP_bar_2, (2*i-2, 0))
         else:
             for i in range(1, enemy_untitled_HP % 300+1):
-                screen.blit(untitled_HP_bar_1, (3*i-3, 0))
+                screen.blit(untitled_HP_bar_1, (2*i-2, 0))
 
     for idx, val in enumerate(bullets): # 모든 총알에 대해 정보를 불러와 그리기
         bullet_pos_x = val["pos_x"]
