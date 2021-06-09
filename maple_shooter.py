@@ -32,6 +32,7 @@
 import pygame
 import time
 import os #파일위치 반환을 위한 라이브러리
+import random
 #################################################################################################
 # 기본 초기화 (반드시 해야 하는 것들)
 pygame.init()
@@ -139,15 +140,14 @@ slime_attack = 1
 
 # 보스1 - 레온
 Leon = pygame.image.load(os.path.join(image_path, "Leon.png"))
+Leon_patterns = [1, 2]
 Leon_pattern_1_ready = pygame.image.load(os.path.join(image_path, "Leon_pattern_1_ready.png"))
-Leon_pattern_1_ready_time = 1000 #ms
 Leon_pattern_1 = pygame.image.load(os.path.join(image_path, "Leon_pattern_1.png"))
-Leon_pattern_1_time = Leon_pattern_1_ready_time + 1000
-delay_time = Leon_pattern_1_time + 1000
 Leon_pattern_2_ready = pygame.image.load(os.path.join(image_path, "Leon_pattern_2_ready.png"))
-Leon_pattern_2_ready_time = 1000
 Leon_pattern_2 = pygame.image.load(os.path.join(image_path, "Leon_pattern_2.png"))
-Leon_pattern_2_time = Leon_pattern_2_ready_time + 1000
+Leon_pattern_ready_time = 1000 
+Leon_pattern_time = Leon_pattern_ready_time + 1000
+Leon_delay_time = Leon_pattern_time + 1000
 Leon_size = Leon.get_rect().size
 Leon_width = Leon_size[0]
 Leon_height = Leon_size[1]
@@ -161,7 +161,7 @@ Leon_pattern_2_y_pos = platform_y_pos - 100
 Leon_attack = 1
 Leon_HP = 200
 Leon_using = False
-Leon_pattern = 1
+Leon_status = -1
 
 #보스2 - untitled
 untitled = pygame.image.load(os.path.join(image_path, "untitled.png"))
@@ -169,10 +169,11 @@ untitled_size = untitled.get_rect().size
 untitled_width = untitled_size[0]
 untitled_height = untitled_size[1]
 untitled_HP = 900 # 300 * 3phase
-untitled_phase = 1
+untitled_phase = 0
 untitled_x_pos = -1000
 untitled_y_pos = 0
 untitled_using = False
+untitled_status = 0
 
 # 필수
 game_font = pygame.font.Font(None, 40) 
@@ -283,44 +284,48 @@ while running:
         character_boshy_x_pos = screen_width - character_boshy_width
 
     if Leon_using == True:
-        if Leon_pattern == 1:
+        if Leon_status == 0:
+            Leon_status = random.choice(Leon_patterns)
+        elif Leon_status == 1:
             pattern_start_time = pygame.time.get_ticks()
-            Leon_pattern = 11
-
-        if Leon_pattern == 11:
-            if pygame.time.get_ticks() - pattern_start_time >= Leon_pattern_1_ready_time:
-                Leon_pattern = 12
-
-        if Leon_pattern == 12:
+            Leon_status = 11
+        elif Leon_status == 11:
+            if pygame.time.get_ticks() - pattern_start_time >= Leon_pattern_ready_time:
+                Leon_status = 12
+        elif Leon_status == 12:
             Leon_pattern_1_x_pos = Leon_width
-            if pygame.time.get_ticks() - pattern_start_time >= Leon_pattern_1_time:
-                Leon_pattern = 13
-                Leon_pattern_1_x_pos = -1000
-
-        if Leon_pattern == 13:
-            if pygame.time.get_ticks() - pattern_start_time >= delay_time:
-                Leon_pattern = 2
-
-        if Leon_pattern == 2:
+            if pygame.time.get_ticks() - pattern_start_time >= Leon_pattern_time:
+                Leon_status = 13
+                Leon_pattern_1_x_pos = -1000        
+        elif Leon_status == 13:
+            if pygame.time.get_ticks() - pattern_start_time >= Leon_delay_time:
+                Leon_status = 0       
+        elif Leon_status == 2:
             pattern_start_time = pygame.time.get_ticks()
-            Leon_pattern = 21
-        
-        if Leon_pattern == 21:
-            if pygame.time.get_ticks() - pattern_start_time >= Leon_pattern_2_ready_time:
-                Leon_pattern = 22
-
-        if Leon_pattern == 22:
+            Leon_status = 21
+        elif Leon_status== 21:
+            if pygame.time.get_ticks() - pattern_start_time >= Leon_pattern_ready_time:
+                Leon_status = 22
+        elif Leon_status == 22:
             Leon_pattern_2_x_pos = platform_x_pos
-            if pygame.time.get_ticks() - pattern_start_time >= Leon_pattern_1_time:
-                Leon_pattern = 23
+            if pygame.time.get_ticks() - pattern_start_time >= Leon_pattern_time:
+                Leon_status = 23
                 Leon_pattern_2_x_pos = -1000
-        
-        if Leon_pattern == 23:
-            if pygame.time.get_ticks() - pattern_start_time >= delay_time:
-                Leon_pattern = 1
+        elif Leon_status == 23:
+            if pygame.time.get_ticks() - pattern_start_time >= Leon_delay_time:
+                Leon_status = 0
 
-    if untitled_using == True:
-        pass # 패턴 설계중
+    if untitled_using == True and untitled_status == 0:
+        if untitled_phase == 1:
+            untitled_patterns = [1, 2, 3]
+            pass # 패턴 설계중 : 공통(강화) 패턴 1개, phase별 패턴 1~3개
+        elif untitled_phase == 2:
+            untitled_patterns = [1, 4, 5]
+            pass
+        else:
+            untitled_patterns = [1, 6, 7]
+            pass
+        random.choice(untitled_patterns)
 
     # 4. 충돌 처리 
     # 필수 (캐릭터 크기를 재는 함수들)
@@ -371,6 +376,8 @@ while running:
 
         elif bullet_rect.colliderect(Leon_rect):
             Leon_HP -= 1
+            if Leon_HP == 199:
+                Leon_status = 0
             if Leon_HP <= 0:
                 Leon_using = False
                 Leon_pattern_1_x_pos = -1000
@@ -380,11 +387,13 @@ while running:
         
         elif bullet_rect.colliderect(untitled_rect):
             untitled_HP -= 1
-            if 300 < untitled_HP <= 600:
+            if 600 <= untitled_HP < 900:
+                untitled_phase = 1
+            elif 300 <= untitled_HP < 600:
                 untitled_phase = 2
-            if 0 < untitled_HP <= 300:
+            elif 0 < untitled_HP < 300:
                 untitled_phase = 3
-            if untitled_HP <= 0:
+            elif untitled_HP <= 0:
                 untitled_using = False
                 character_boshy_Exp += Leon_Exp
             bullet_to_remove = bullet_idx
@@ -461,13 +470,13 @@ while running:
     screen.blit(platform, (platform_x_pos, platform_y_pos))
 
     if Leon_using == True:
-        if Leon_pattern == 11:
+        if Leon_status == 11:
             screen.blit(Leon_pattern_1_ready, (Leon_width, Leon_pattern_1_y_pos))
-        if Leon_pattern == 12:
+        if Leon_status == 12:
             screen.blit(Leon_pattern_1, (Leon_pattern_1_x_pos, Leon_pattern_1_y_pos))
-        if Leon_pattern == 21:
+        if Leon_status == 21:
             screen.blit(Leon_pattern_2_ready, (platform_x_pos, Leon_pattern_2_y_pos))
-        if Leon_pattern == 22:
+        if Leon_status == 22:
             screen.blit(Leon_pattern_2, (Leon_pattern_2_x_pos, Leon_pattern_2_y_pos))
     
     if slime_using == True:
