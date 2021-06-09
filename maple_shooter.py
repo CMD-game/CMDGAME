@@ -63,6 +63,9 @@ stage_height = stage_size[1]
 
 character_HP_bar = pygame.image.load(os.path.join(image_path, "HP_bar.png"))
 Leon_HP_bar = pygame.image.load(os.path.join(image_path, "Leon_HP_bar.png"))
+untitled_HP_bar_1 = pygame.image.load(os.path.join(image_path, "untitled_HP_bar_1.png"))
+untitled_HP_bar_2 = pygame.image.load(os.path.join(image_path, "untitled_HP_bar_2.png"))
+untitled_HP_bar_3 = pygame.image.load(os.path.join(image_path, "untitled_HP_bar_3.png"))
 
 # 플랫폼은 하나가 제일 적당할 듯
 platform = pygame.image.load(os.path.join(image_path, "M_platform.png"))
@@ -132,7 +135,7 @@ enemy_slime_using = True
 Slime = True
 enemy_slime_attack = 1
 
-# 보스1_레온?
+# 보스1 - 레온
 enemy_Leon = pygame.image.load(os.path.join(image_path, "Leon.png"))
 enemy_Leon_pattern_1_ready = pygame.image.load(os.path.join(image_path, "Leon_pattern_1_ready.png"))
 enemy_Leon_pattern_1_ready_time = 1000 #ms
@@ -157,6 +160,16 @@ enemy_Leon_attack = 1
 enemy_Leon_HP = 200
 enemy_Leon_using = False
 enemy_Leon_pattern = 1
+
+#보스2 - untitled
+enemy_untitled = pygame.image.load(os.path.join(image_path, "untitled.png"))
+enemy_untitled_size = enemy_untitled.get_rect().size
+enemy_untitled_width = enemy_untitled_size[0]
+enemy_untitled_height = enemy_untitled_size[1]
+enemy_untitled_HP = 900 # 300 * 3phase
+enemy_untitled_x_pos = 0
+enemy_untitled_y_pos = 0
+enemy_untitled_using = False
 
 # 필수
 game_font = pygame.font.Font(None, 40) 
@@ -233,8 +246,9 @@ while running:
                     enemy_slime_using = False
                     Slime = False
                     enemy_Leon_using = True
+                elif enemy_untitled_HP == 900:
+                    enemy_untitled_using = True
 
-        
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
                 character_boshy_to_x_LEFT = 0
@@ -460,7 +474,22 @@ while running:
 
     if enemy_Leon_using == True:
         for i in range(1, enemy_Leon_HP+1):
-            screen.blit(Leon_HP_bar, (3*i -3, 0))
+            screen.blit(Leon_HP_bar, (3*i-3, 0))
+
+    if enemy_untitled_using == True:
+        if enemy_untitled_HP >= 600:
+            for i in range(1, 301):
+                screen.blit(untitled_HP_bar_2, (3*i-3, 0))
+            for i in range(1, enemy_untitled_HP % 300+1):
+                screen.blit(untitled_HP_bar_3, (3*i-3, 0))
+        elif enemy_untitled_HP >= 300:
+            for i in range(1, 301):
+                screen.blit(untitled_HP_bar_1, (3*i-3, 0))
+            for i in range(1, enemy_untitled_HP % 300+1):
+                screen.blit(untitled_HP_bar_2, (3*i-3, 0))
+        else:
+            for i in range(1, enemy_untitled_HP % 300+1):
+                screen.blit(untitled_HP_bar_1, (3*i-3, 0))
 
     for idx, val in enumerate(bullets): # 모든 총알에 대해 정보를 불러와 그리기
         bullet_pos_x = val["pos_x"]
