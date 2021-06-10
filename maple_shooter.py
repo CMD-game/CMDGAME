@@ -64,9 +64,9 @@ stage_height = stage_size[1]
 
 character_HP_bar = pygame.image.load(os.path.join(image_path, "HP_bar.png"))
 Leon_HP_bar = pygame.image.load(os.path.join(image_path, "Leon_HP_bar.png"))
-untitled_HP_bar_1 = pygame.image.load(os.path.join(image_path, "untitled_HP_bar_1.png"))
-untitled_HP_bar_2 = pygame.image.load(os.path.join(image_path, "untitled_HP_bar_2.png"))
-untitled_HP_bar_3 = pygame.image.load(os.path.join(image_path, "untitled_HP_bar_3.png"))
+Pierrot_HP_bar_1 = pygame.image.load(os.path.join(image_path, "Pierrot_HP_bar_1.png"))
+Pierrot_HP_bar_2 = pygame.image.load(os.path.join(image_path, "Pierrot_HP_bar_2.png"))
+Pierrot_HP_bar_3 = pygame.image.load(os.path.join(image_path, "Pierrot_HP_bar_3.png"))
 
 # 플랫폼(발판)
 platform = pygame.image.load(os.path.join(image_path, "M_platform.png"))
@@ -136,7 +136,6 @@ slime_regen = 1000 # 실제 리젠 시간
 slime_regen_time = 0 # 리젠 시간을 재기 위한 변수(0으로 고정)
 slime_using = True
 Slime = True
-<<<<<<< Updated upstream
 slime_attack = 1
 
 # 보스1 - 레온
@@ -164,57 +163,18 @@ Leon_HP = 200
 Leon_using = False
 Leon_status = -1
 
-#보스2 - untitled
-untitled = pygame.image.load(os.path.join(image_path, "untitled.png"))
-untitled_size = untitled.get_rect().size
-untitled_width = untitled_size[0]
-untitled_height = untitled_size[1]
-untitled_HP = 900 # 300 * 3phase
-untitled_phase = 0
-untitled_x_pos = -1000
-untitled_y_pos = 0
-untitled_using = False
-untitled_status = 0
-=======
-enemy_slime_attack = 1
-
-# 보스1 레온
-enemy_Leon = pygame.image.load(os.path.join(image_path, "Leon.png"))
-enemy_Leon_pattern_1_ready = pygame.image.load(os.path.join(image_path, "Leon_pattern_1_ready.png"))
-enemy_Leon_pattern_1_ready_time = 1000 #ms
-enemy_Leon_pattern_1 = pygame.image.load(os.path.join(image_path, "Leon_pattern_1.png"))
-enemy_Leon_pattern_1_time = enemy_Leon_pattern_1_ready_time + 1000
-delay_time = enemy_Leon_pattern_1_time + 1000
-enemy_Leon_pattern_2_ready = pygame.image.load(os.path.join(image_path, "Leon_pattern_2_ready.png"))
-enemy_Leon_pattern_2_ready_time = 1000
-enemy_Leon_pattern_2 = pygame.image.load(os.path.join(image_path, "Leon_pattern_2.png"))
-enemy_Leon_pattern_2_time = enemy_Leon_pattern_2_ready_time + 1000
-enemy_Leon_size = enemy_Leon.get_rect().size
-enemy_Leon_width = enemy_Leon_size[0]
-enemy_Leon_height = enemy_Leon_size[1]
-enemy_Leon_x_pos = 0
-enemy_Leon_y_pos = screen_height - enemy_Leon_height - stage_height
-enemy_Leon_Exp = 100
-enemy_Leon_pattern_1_x_pos = -1000
-enemy_Leon_pattern_1_y_pos = screen_height - stage_height - 80
-enemy_Leon_pattern_2_x_pos = -1000
-enemy_Leon_pattern_2_y_pos = platform_y_pos - 100
-enemy_Leon_attack = 1
-enemy_Leon_HP = 200
-enemy_Leon_using = False
-enemy_Leon_pattern = 1
->>>>>>> Stashed changes
-
-#보스2 삐에로
+#보스2 - Pierrot
 Pierrot = pygame.image.load(os.path.join(image_path, "Pierrot.png"))
 Pierrot_size = Pierrot.get_rect().size
 Pierrot_width = Pierrot_size[0]
 Pierrot_height = Pierrot_size[1]
-Pierrot_x_pos = 0
+Pierrot_HP = 900 # 300 * 3phase
+Pierrot_phase = 0
+Pierrot_x_pos = -1000
 Pierrot_y_pos = screen_height - Pierrot_height - stage_height
-Pierrot_Exp = 100
-Pierrot_HP = 200
 Pierrot_using = False
+Pierrot_status = 0
+
 Pierrot_ball_image = [
     pygame.image.load(os.path.join(image_path, "Pierrot_ball_1.png")),
     pygame.image.load(os.path.join(image_path, "Pierrot_ball_2.png")),
@@ -282,48 +242,15 @@ while running:
                 airborne_distance = 5 # 하향점프의 처음 속도는 5
             #총알 발사
             elif event.key == pygame.K_a: # a키를 누름 : 공격
-<<<<<<< Updated upstream
                 event_attack = 1
-=======
-                try: # try/except/else 구문 : try에서 error가 발생하면 except, 아니면 else 실행
-                    if bullet_1_using == False: # 총알 사용 여부 확인
-                        bullet_1_using = True
-                        bullet_number = 0
-                    elif bullet_2_using == False:
-                        bullet_2_using = True
-                        bullet_number = 1
-                    elif bullet_3_using == False:
-                        bullet_3_using = True
-                        bullet_number = 2
-                    elif bullet_4_using == False:
-                        bullet_4_using = True
-                        bullet_number = 3
-                    else: # 모든 총알이 사용중일 때 a를 누르면 고의로 에러 발생
-                        print(5/0)
-                except ZeroDivisionError: # 에러가 나면 break
-                    break
-                else: # 아니면 총알의 정보를 수집해 저장
-                    bullet_x_pos = character_boshy_x_pos + (character_boshy_width - bullet_width) / 2
-                    bullet_y_pos = character_boshy_y_pos + 10
-                    if character_boshy_to_x_LEFT_press == 1: # 왼쪽을 보고 있다면 to_x의 부호 반대
-                        bullet_LEFT = -1
-                    else:
-                        bullet_LEFT = 1
-                    bullets.append({
-                        "pos_x" : bullet_x_pos, 
-                        "pos_y" : bullet_y_pos,
-                        "img_idx" : bullet_number,
-                        "to_x" : bullet_speed * bullet_LEFT }) # 딕셔너리를 이용함, 중괄호 안의 수치는 변경 가능
-            #보스 소환
->>>>>>> Stashed changes
             elif event.key == pygame.K_n:
                 if Leon_HP >= 1:
                     slime_using = False
                     Slime = False
                     Leon_using = True
-                elif untitled_HP >= 1:
-                    untitled_using = True
-                    untitled_x_pos = 0
+                elif Pierrot_HP >= 1:
+                    Pierrot_using = True
+                    Pierrot_x_pos = 0
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
@@ -415,17 +342,17 @@ while running:
             if pygame.time.get_ticks() - pattern_start_time >= Leon_delay_time:
                 Leon_status = 0
 
-    if untitled_using == True and untitled_status == 0:
-        if untitled_phase == 1:
-            untitled_patterns = [1, 2, 3]
+    if Pierrot_using == True and Pierrot_status == 0:
+        if Pierrot_phase == 1:
+            Pierrot_patterns = [1, 2, 3]
             pass # 패턴 설계중 : 공통(강화) 패턴 1개, phase별 패턴 1~3개
-        elif untitled_phase == 2:
-            untitled_patterns = [1, 4, 5]
+        elif Pierrot_phase == 2:
+            Pierrot_patterns = [1, 4, 5]
             pass
         else:
-            untitled_patterns = [1, 6, 7]
+            Pierrot_patterns = [1, 6, 7]
             pass
-        random.choice(untitled_patterns)
+        random.choice(Pierrot_patterns)
 
     # 4. 충돌 처리 
     # 필수 (캐릭터 크기를 재는 함수들)
@@ -439,9 +366,9 @@ while running:
     Leon_rect = Leon.get_rect()
     Leon_rect.left = Leon_x_pos
     Leon_rect.top = Leon_y_pos
-    untitled_rect = untitled.get_rect()
-    untitled_rect.left = untitled_x_pos
-    untitled_rect.top = untitled_y_pos
+    Pierrot_rect = Pierrot.get_rect()
+    Pierrot_rect.left = Pierrot_x_pos
+    Pierrot_rect.top = Pierrot_y_pos
 
     platform_rect = platform.get_rect()
     platform_rect.left = platform_x_pos
@@ -491,16 +418,16 @@ while running:
                 character_boshy_Exp += Leon_Exp
             bullet_to_remove = bullet_idx
         
-        elif bullet_rect.colliderect(untitled_rect):
-            untitled_HP -= 1
-            if 600 <= untitled_HP < 900:
-                untitled_phase = 1
-            elif 300 <= untitled_HP < 600:
-                untitled_phase = 2
-            elif 0 < untitled_HP < 300:
-                untitled_phase = 3
-            elif untitled_HP <= 0:
-                untitled_using = False
+        elif bullet_rect.colliderect(Pierrot_rect):
+            Pierrot_HP -= 1
+            if 600 <= Pierrot_HP < 900:
+                Pierrot_phase = 1
+            elif 300 <= Pierrot_HP < 600:
+                Pierrot_phase = 2
+            elif 0 < Pierrot_HP < 300:
+                Pierrot_phase = 3
+            elif Pierrot_HP <= 0:
+                Pierrot_using = False
                 character_boshy_Exp += Leon_Exp
             bullet_to_remove = bullet_idx
 
@@ -533,18 +460,10 @@ while running:
     if character_boshy_Exp >= MAX_Exp:
         character_boshy_Exp -= MAX_Exp
         character_boshy_Level += 1
-<<<<<<< Updated upstream
         character_boshy_HP += 1 # 레벨업시 체력 1 증가
 
     if slime_using == False:
         slime_x_pos = -1000
-=======
-        character_boshy_HP += 1
-    
-    #현재 보스 상태
-    if enemy_slime_using == False:
-        enemy_slime_x_pos = -1000
->>>>>>> Stashed changes
         if Slime == True:
             if (pygame.time.get_ticks() - slime_start_ticks) - slime_regen_time >= slime_regen:
                 slime_using = True
@@ -558,16 +477,9 @@ while running:
         Leon_x_pos = -1000
         Leon_pattern_1_x_pos = -1000
 
-<<<<<<< Updated upstream
     if invincibility == 0: # 무적이 아닐 때
         if character_boshy_rect.colliderect(slime_rect): # 캐릭터와 슬라임이 충돌
             character_boshy_HP -= slime_attack
-=======
-    #무적이 아닐 때
-    if invincibility == 0:
-        if character_boshy_rect.colliderect(enemy_slime_rect): # 캐릭터와 슬라임이 충돌
-            character_boshy_HP -= enemy_slime_attack
->>>>>>> Stashed changes
             invincibility = 2
         elif character_boshy_rect.colliderect(Leon_rect) or character_boshy_rect.colliderect(Leon_pattern_1_rect) or character_boshy_rect.colliderect(Leon_pattern_2_rect):
             character_boshy_HP -= Leon_attack
@@ -611,7 +523,6 @@ while running:
     screen.blit(stage, (0, (screen_height - stage_height))) 
     screen.blit(platform, (platform_x_pos, platform_y_pos))
 
-<<<<<<< Updated upstream
     if Leon_using == True:
         if Leon_status == 11:
             screen.blit(Leon_pattern_1_ready, (Leon_width, Leon_pattern_1_y_pos))
@@ -628,35 +539,14 @@ while running:
     if Leon_using == True:
         screen.blit(Leon, (Leon_x_pos, Leon_y_pos))
 
-    if untitled_using == True:
-        screen.blit(untitled, (untitled_x_pos, untitled_y_pos))
-=======
-    #레온 패턴
-    if enemy_Leon_using == True:
-        if enemy_Leon_pattern == 11:
-            screen.blit(enemy_Leon_pattern_1_ready, (enemy_Leon_width, enemy_Leon_pattern_1_y_pos))
-        if enemy_Leon_pattern == 12:
-            screen.blit(enemy_Leon_pattern_1, (enemy_Leon_pattern_1_x_pos, enemy_Leon_pattern_1_y_pos))
-        if enemy_Leon_pattern == 21:
-            screen.blit(enemy_Leon_pattern_2_ready, (platform_x_pos, enemy_Leon_pattern_2_y_pos))
-        if enemy_Leon_pattern == 22:
-            screen.blit(enemy_Leon_pattern_2, (enemy_Leon_pattern_2_x_pos, enemy_Leon_pattern_2_y_pos))
-    
-    #공 튕기기
     for idx, val in enumerate(Pierrot_ball):
         Pierrot_ball_pos_x = val["pos_x"]
         Pierrot_ball_pos_y = val["pos_y"]
         Pierrot_ball_img_idx = val["img_idx"]
         screen.blit(Pierrot_ball_image[Pierrot_ball_img_idx], (Pierrot_ball_pos_x, Pierrot_ball_pos_y))
-
-    #슬라임
-    if enemy_slime_using == True:
-        screen.blit(enemy_slime, (enemy_slime_x_pos, enemy_slime_y_pos))
-
-    #레온
-    if enemy_Leon_using == True:
-        screen.blit(enemy_Leon, (enemy_Leon_x_pos, enemy_Leon_y_pos))
->>>>>>> Stashed changes
+        
+    if Pierrot_using == True:
+        screen.blit(Pierrot, (Pierrot_x_pos, Pierrot_y_pos))
 
     # 무적 시간에 깜빡임 구현 (더 나은 방안이 있으면 수정 바람)
     if invincibility == True: 
@@ -685,31 +575,24 @@ while running:
     for i in range(1, character_boshy_HP+1): # range 범위 : 이상 미만
         screen.blit(character_HP_bar, (screen_width - 30*i - 12, 10))
 
-<<<<<<< Updated upstream
     if Leon_using == True:
         for i in range(1, Leon_HP+1):
             screen.blit(Leon_HP_bar, (3*i-3, 0))
 
-    if untitled_using == True:
-        if untitled_phase == 1:
+    if Pierrot_using == True:
+        if Pierrot_phase == 1:
             for i in range(1, 301):
-                screen.blit(untitled_HP_bar_2, (2*i-2, 0))
-            for i in range(1, untitled_HP % 300 + 1):
-                screen.blit(untitled_HP_bar_3, (2*i-2, 0))
-        elif untitled_phase == 2:
+                screen.blit(Pierrot_HP_bar_2, (2*i-2, 0))
+            for i in range(1, Pierrot_HP % 300 + 1):
+                screen.blit(Pierrot_HP_bar_3, (2*i-2, 0))
+        elif Pierrot_phase == 2:
             for i in range(1, 301):
-                screen.blit(untitled_HP_bar_1, (2*i-2, 0))
-            for i in range(1, untitled_HP % 300+1):
-                screen.blit(untitled_HP_bar_2, (2*i-2, 0))
+                screen.blit(Pierrot_HP_bar_1, (2*i-2, 0))
+            for i in range(1, Pierrot_HP % 300+1):
+                screen.blit(Pierrot_HP_bar_2, (2*i-2, 0))
         else:
-            for i in range(1, untitled_HP % 300+1):
-                screen.blit(untitled_HP_bar_1, (2*i-2, 0))
-=======
-    #레온 체력
-    if enemy_Leon_using == True:
-        for i in range(1, enemy_Leon_HP+1):
-            screen.blit(Leon_HP_bar, (3*i -3, 0))
->>>>>>> Stashed changes
+            for i in range(1, Pierrot_HP % 300+1):
+                screen.blit(Pierrot_HP_bar_1, (2*i-2, 0))
 
     # 모든 총알에 대해 정보를 불러와 그리기
     for idx, val in enumerate(bullets): 
