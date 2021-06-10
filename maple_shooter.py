@@ -68,12 +68,12 @@ untitled_HP_bar_1 = pygame.image.load(os.path.join(image_path, "untitled_HP_bar_
 untitled_HP_bar_2 = pygame.image.load(os.path.join(image_path, "untitled_HP_bar_2.png"))
 untitled_HP_bar_3 = pygame.image.load(os.path.join(image_path, "untitled_HP_bar_3.png"))
 
-# 플랫폼은 하나가 제일 적당할 듯
+# 플랫폼(발판)
 platform = pygame.image.load(os.path.join(image_path, "M_platform.png"))
 platform_x_pos = 300
 platform_y_pos = screen_height - 150
 
-# 가져온 캐릭터 이름이 boshy
+# 캐릭터(boshy)
 character_boshy = pygame.image.load(os.path.join(image_path, "character_boshy.png"))
 character_boshy_LEFT = pygame.image.load(os.path.join(image_path, "character_boshy_LEFT.png"))
 character_boshy_size = character_boshy.get_rect().size
@@ -136,6 +136,7 @@ slime_regen = 1000 # 실제 리젠 시간
 slime_regen_time = 0 # 리젠 시간을 재기 위한 변수(0으로 고정)
 slime_using = True
 Slime = True
+<<<<<<< Updated upstream
 slime_attack = 1
 
 # 보스1 - 레온
@@ -174,6 +175,69 @@ untitled_x_pos = -1000
 untitled_y_pos = 0
 untitled_using = False
 untitled_status = 0
+=======
+enemy_slime_attack = 1
+
+# 보스1 레온
+enemy_Leon = pygame.image.load(os.path.join(image_path, "Leon.png"))
+enemy_Leon_pattern_1_ready = pygame.image.load(os.path.join(image_path, "Leon_pattern_1_ready.png"))
+enemy_Leon_pattern_1_ready_time = 1000 #ms
+enemy_Leon_pattern_1 = pygame.image.load(os.path.join(image_path, "Leon_pattern_1.png"))
+enemy_Leon_pattern_1_time = enemy_Leon_pattern_1_ready_time + 1000
+delay_time = enemy_Leon_pattern_1_time + 1000
+enemy_Leon_pattern_2_ready = pygame.image.load(os.path.join(image_path, "Leon_pattern_2_ready.png"))
+enemy_Leon_pattern_2_ready_time = 1000
+enemy_Leon_pattern_2 = pygame.image.load(os.path.join(image_path, "Leon_pattern_2.png"))
+enemy_Leon_pattern_2_time = enemy_Leon_pattern_2_ready_time + 1000
+enemy_Leon_size = enemy_Leon.get_rect().size
+enemy_Leon_width = enemy_Leon_size[0]
+enemy_Leon_height = enemy_Leon_size[1]
+enemy_Leon_x_pos = 0
+enemy_Leon_y_pos = screen_height - enemy_Leon_height - stage_height
+enemy_Leon_Exp = 100
+enemy_Leon_pattern_1_x_pos = -1000
+enemy_Leon_pattern_1_y_pos = screen_height - stage_height - 80
+enemy_Leon_pattern_2_x_pos = -1000
+enemy_Leon_pattern_2_y_pos = platform_y_pos - 100
+enemy_Leon_attack = 1
+enemy_Leon_HP = 200
+enemy_Leon_using = False
+enemy_Leon_pattern = 1
+>>>>>>> Stashed changes
+
+#보스2 삐에로
+Pierrot = pygame.image.load(os.path.join(image_path, "Pierrot.png"))
+Pierrot_size = Pierrot.get_rect().size
+Pierrot_width = Pierrot_size[0]
+Pierrot_height = Pierrot_size[1]
+Pierrot_x_pos = 0
+Pierrot_y_pos = screen_height - Pierrot_height - stage_height
+Pierrot_Exp = 100
+Pierrot_HP = 200
+Pierrot_using = False
+Pierrot_ball_image = [
+    pygame.image.load(os.path.join(image_path, "Pierrot_ball_1.png")),
+    pygame.image.load(os.path.join(image_path, "Pierrot_ball_2.png")),
+    pygame.image.load(os.path.join(image_path, "Pierrot_ball_3.png")),
+    pygame.image.load(os.path.join(image_path, "Pierrot_ball_4.png"))
+    ]
+
+#공 크기에 따른 최초 스피드
+ball_speed_y = [-18, -15, -12, -9] #index 0, 1, 2, 3에 해당하는 값
+
+#공들
+Pierrot_ball = []
+
+#최초 발생한는 큰 공 추가
+Pierrot_ball.append({
+    "pos_x" : 50, #공의 x좌표
+    "pos_y" : 50, #공의 y좌표
+    "img_idx" : 0, #공의 이미지 인덱스
+    "to_x" : 3, #x축의 이동방향, -3이면 왼쪽, 3이면 오른쪽으로
+    "to_y" : -6, #y축 이동방향
+    "init_spd_y" : ball_speed_y[0] #y축 최초 속도
+})
+
 
 # 필수
 game_font = pygame.font.Font(None, 40) 
@@ -196,6 +260,7 @@ while running:
         if event.type == pygame.QUIT: # 창을 닫았을 때
             # 저장 후 종료하시겠습니까? 창 띄우기
             running = False 
+        #캐릭터 이동    
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 character_boshy_to_x_LEFT -= character_boshy_speed
@@ -215,8 +280,42 @@ while running:
                 character_boshy_y_pos += 20 # y좌표를 20만큼 내려서 발판에서 떨어지게 만듦
                 airborne = True
                 airborne_distance = 5 # 하향점프의 처음 속도는 5
+            #총알 발사
             elif event.key == pygame.K_a: # a키를 누름 : 공격
+<<<<<<< Updated upstream
                 event_attack = 1
+=======
+                try: # try/except/else 구문 : try에서 error가 발생하면 except, 아니면 else 실행
+                    if bullet_1_using == False: # 총알 사용 여부 확인
+                        bullet_1_using = True
+                        bullet_number = 0
+                    elif bullet_2_using == False:
+                        bullet_2_using = True
+                        bullet_number = 1
+                    elif bullet_3_using == False:
+                        bullet_3_using = True
+                        bullet_number = 2
+                    elif bullet_4_using == False:
+                        bullet_4_using = True
+                        bullet_number = 3
+                    else: # 모든 총알이 사용중일 때 a를 누르면 고의로 에러 발생
+                        print(5/0)
+                except ZeroDivisionError: # 에러가 나면 break
+                    break
+                else: # 아니면 총알의 정보를 수집해 저장
+                    bullet_x_pos = character_boshy_x_pos + (character_boshy_width - bullet_width) / 2
+                    bullet_y_pos = character_boshy_y_pos + 10
+                    if character_boshy_to_x_LEFT_press == 1: # 왼쪽을 보고 있다면 to_x의 부호 반대
+                        bullet_LEFT = -1
+                    else:
+                        bullet_LEFT = 1
+                    bullets.append({
+                        "pos_x" : bullet_x_pos, 
+                        "pos_y" : bullet_y_pos,
+                        "img_idx" : bullet_number,
+                        "to_x" : bullet_speed * bullet_LEFT }) # 딕셔너리를 이용함, 중괄호 안의 수치는 변경 가능
+            #보스 소환
+>>>>>>> Stashed changes
             elif event.key == pygame.K_n:
                 if Leon_HP >= 1:
                     slime_using = False
@@ -266,7 +365,8 @@ while running:
                     "to_x" : bullet_speed * bullet_LEFT }) # 딕셔너리를 이용함, 중괄호 안의 수치는 변경 가능
                 event_attack_end_time = pygame.time.get_ticks()
 
-    if airborne == True: # 점프
+    #캐릭터 점프
+    if airborne == True: 
         character_boshy_y_pos += airborne_distance # 캐릭터가 점프 속도만큼 이동
         airborne_distance += jump_speed # 점프 속도 증가
         if airborne_distance > 10: # 종단 속도
@@ -354,6 +454,12 @@ while running:
     Leon_pattern_2_rect.left = Leon_pattern_2_x_pos
     Leon_pattern_2_rect.top = Leon_pattern_2_y_pos
 
+    Pierrot_rect = Pierrot.get_rect()
+    Pierrot_ball_1_rect = Pierrot_ball_image[0].get_rect()
+    Pierrot_ball_2_rect = Pierrot_ball_image[1].get_rect()
+    Pierrot_ball_3_rect = Pierrot_ball_image[2].get_rect()
+    Pierrot_ball_4_rect = Pierrot_ball_image[3].get_rect()
+
     # 총알 위치 정의
     for bullet_idx, bullet_val in enumerate(bullets):
         bullet_pos_x = bullet_val["pos_x"]
@@ -410,8 +516,8 @@ while running:
             del bullets[bullet_to_remove] # 사용된 총알 제거 / index 문제는 해결 but 총알이 공중에서 멈춤
             bullet_to_remove = -1 # 변수값 초기화
 
-
-    if character_boshy_rect.colliderect(platform_rect): # 플랫폼 착지
+    #캐릭터 플랫폼 착지
+    if character_boshy_rect.colliderect(platform_rect):
         if (character_boshy_y_pos + character_boshy_height - 10) <= platform_y_pos and airborne_distance >= 0:
             airborne = False
             airborne_distance = jump_height
@@ -423,13 +529,22 @@ while running:
                 airborne_distance = 0
                 airborne = True
 
+    #레벨업시 체력 1 증가    
     if character_boshy_Exp >= MAX_Exp:
         character_boshy_Exp -= MAX_Exp
         character_boshy_Level += 1
+<<<<<<< Updated upstream
         character_boshy_HP += 1 # 레벨업시 체력 1 증가
 
     if slime_using == False:
         slime_x_pos = -1000
+=======
+        character_boshy_HP += 1
+    
+    #현재 보스 상태
+    if enemy_slime_using == False:
+        enemy_slime_x_pos = -1000
+>>>>>>> Stashed changes
         if Slime == True:
             if (pygame.time.get_ticks() - slime_start_ticks) - slime_regen_time >= slime_regen:
                 slime_using = True
@@ -443,9 +558,16 @@ while running:
         Leon_x_pos = -1000
         Leon_pattern_1_x_pos = -1000
 
+<<<<<<< Updated upstream
     if invincibility == 0: # 무적이 아닐 때
         if character_boshy_rect.colliderect(slime_rect): # 캐릭터와 슬라임이 충돌
             character_boshy_HP -= slime_attack
+=======
+    #무적이 아닐 때
+    if invincibility == 0:
+        if character_boshy_rect.colliderect(enemy_slime_rect): # 캐릭터와 슬라임이 충돌
+            character_boshy_HP -= enemy_slime_attack
+>>>>>>> Stashed changes
             invincibility = 2
         elif character_boshy_rect.colliderect(Leon_rect) or character_boshy_rect.colliderect(Leon_pattern_1_rect) or character_boshy_rect.colliderect(Leon_pattern_2_rect):
             character_boshy_HP -= Leon_attack
@@ -461,6 +583,26 @@ while running:
         if (pygame.time.get_ticks() - start_ticks) - invincibility_time >= 1000: # 1000: 무적 시간(ms)
             invincibility = 0
 
+    #공 위치 정의
+    for Pierrot_ball_idx, Pierrot_ball_val in enumerate(Pierrot_ball):
+        ball_pos_x = Pierrot_ball_val["pos_x"]
+        ball_pos_y = Pierrot_ball_val["pos_y"]
+        ball_img_idx = Pierrot_ball_val["img_idx"]
+        ball_size = Pierrot_ball_image[Pierrot_ball_idx].get_rect().size
+        ball_width = ball_size[0]
+        ball_height = ball_size[1]
+
+        if ball_pos_x < 0 or ball_pos_x > (screen_width - ball_width): #공이 벽에서 튕기게 하기
+            Pierrot_ball_val["to_x"] = Pierrot_ball_val["to_x"] * -1
+        
+        if ball_pos_y >=screen_height - stage_height - ball_height:
+            Pierrot_ball_val["to_y"] = Pierrot_ball_val["init_spd_y"]
+        else:
+            Pierrot_ball_val["to_y"] += 0.5
+
+        Pierrot_ball_val["pos_x"] += Pierrot_ball_val["to_x"]
+        Pierrot_ball_val["pos_y"] += Pierrot_ball_val["to_y"] ####화면 그리기(x)
+
     # 게임 화면 표시
     Level = game_font.render("Lv.{}".format(int(character_boshy_Level)), True, (255, 255, 0))
 
@@ -469,6 +611,7 @@ while running:
     screen.blit(stage, (0, (screen_height - stage_height))) 
     screen.blit(platform, (platform_x_pos, platform_y_pos))
 
+<<<<<<< Updated upstream
     if Leon_using == True:
         if Leon_status == 11:
             screen.blit(Leon_pattern_1_ready, (Leon_width, Leon_pattern_1_y_pos))
@@ -487,8 +630,36 @@ while running:
 
     if untitled_using == True:
         screen.blit(untitled, (untitled_x_pos, untitled_y_pos))
+=======
+    #레온 패턴
+    if enemy_Leon_using == True:
+        if enemy_Leon_pattern == 11:
+            screen.blit(enemy_Leon_pattern_1_ready, (enemy_Leon_width, enemy_Leon_pattern_1_y_pos))
+        if enemy_Leon_pattern == 12:
+            screen.blit(enemy_Leon_pattern_1, (enemy_Leon_pattern_1_x_pos, enemy_Leon_pattern_1_y_pos))
+        if enemy_Leon_pattern == 21:
+            screen.blit(enemy_Leon_pattern_2_ready, (platform_x_pos, enemy_Leon_pattern_2_y_pos))
+        if enemy_Leon_pattern == 22:
+            screen.blit(enemy_Leon_pattern_2, (enemy_Leon_pattern_2_x_pos, enemy_Leon_pattern_2_y_pos))
+    
+    #공 튕기기
+    for idx, val in enumerate(Pierrot_ball):
+        Pierrot_ball_pos_x = val["pos_x"]
+        Pierrot_ball_pos_y = val["pos_y"]
+        Pierrot_ball_img_idx = val["img_idx"]
+        screen.blit(Pierrot_ball_image[Pierrot_ball_img_idx], (Pierrot_ball_pos_x, Pierrot_ball_pos_y))
 
-    if invincibility == True: # 무적 시간에 깜빡임 구현 (더 나은 방안이 있으면 수정 바람)
+    #슬라임
+    if enemy_slime_using == True:
+        screen.blit(enemy_slime, (enemy_slime_x_pos, enemy_slime_y_pos))
+
+    #레온
+    if enemy_Leon_using == True:
+        screen.blit(enemy_Leon, (enemy_Leon_x_pos, enemy_Leon_y_pos))
+>>>>>>> Stashed changes
+
+    # 무적 시간에 깜빡임 구현 (더 나은 방안이 있으면 수정 바람)
+    if invincibility == True: 
         if int((pygame.time.get_ticks() - start_ticks - invincibility_time) / 250) % 2 == 0:
             pass
         else:
@@ -510,9 +681,11 @@ while running:
         else:
             screen.blit(character_boshy, (character_boshy_x_pos, character_boshy_y_pos))
     
+    #캐릭터 체력
     for i in range(1, character_boshy_HP+1): # range 범위 : 이상 미만
         screen.blit(character_HP_bar, (screen_width - 30*i - 12, 10))
 
+<<<<<<< Updated upstream
     if Leon_using == True:
         for i in range(1, Leon_HP+1):
             screen.blit(Leon_HP_bar, (3*i-3, 0))
@@ -531,8 +704,15 @@ while running:
         else:
             for i in range(1, untitled_HP % 300+1):
                 screen.blit(untitled_HP_bar_1, (2*i-2, 0))
+=======
+    #레온 체력
+    if enemy_Leon_using == True:
+        for i in range(1, enemy_Leon_HP+1):
+            screen.blit(Leon_HP_bar, (3*i -3, 0))
+>>>>>>> Stashed changes
 
-    for idx, val in enumerate(bullets): # 모든 총알에 대해 정보를 불러와 그리기
+    # 모든 총알에 대해 정보를 불러와 그리기
+    for idx, val in enumerate(bullets): 
         bullet_pos_x = val["pos_x"]
         bullet_pos_y = val["pos_y"]
         bullet_img_idx = val["img_idx"]
@@ -544,10 +724,10 @@ while running:
 if Game_over_check == 1:
     last_time = pygame.time.get_ticks()
     Game_over_check = 11
-
+    
+# 몇초 기다리기 -> 꺼짐
 while Game_over_check == 11:
     screen.blit(Game_over, (0, 0))
     pygame.display.update()
     if pygame.time.get_ticks() - last_time >= 3000: #ms
         Game_over_check = 0
-# 몇초 기다리기 -> 꺼짐
