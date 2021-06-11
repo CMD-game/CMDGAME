@@ -67,6 +67,7 @@ Leon_HP_bar = pygame.image.load(os.path.join(image_path, "Leon_HP_bar.png"))
 Pierrot_HP_bar_1 = pygame.image.load(os.path.join(image_path, "Pierrot_HP_bar_1.png"))
 Pierrot_HP_bar_2 = pygame.image.load(os.path.join(image_path, "Pierrot_HP_bar_2.png"))
 Pierrot_HP_bar_3 = pygame.image.load(os.path.join(image_path, "Pierrot_HP_bar_3.png"))
+Pierrot_pattern_0_HP_bar = pygame.image.load(os.path.join(image_path, "Pierrot_pattern_0_HP_bar.png"))
 
 # 플랫폼(발판)
 platform = pygame.image.load(os.path.join(image_path, "M_platform.png"))
@@ -171,9 +172,19 @@ Pierrot_height = Pierrot_size[1]
 Pierrot_HP = 900 # 300 * 3phase
 Pierrot_phase = 0
 Pierrot_x_pos = -1000
-Pierrot_y_pos = screen_height - Pierrot_height - stage_height
 Pierrot_using = False
-Pierrot_status = 0
+Pierrot_status = -1
+Pierrot_stun = 0
+
+Pierrot_pattern_0 = pygame.image.load(os.path.join(image_path, "Pierrot_pattern_0.png"))
+Pierrot_pattern_0_size = Pierrot_pattern_0.get_rect().size
+Pierrot_pattern_0_width = Pierrot_pattern_0_size[0]
+Pierrot_pattern_0_height = Pierrot_pattern_0_size[1]
+Pierrot_pattern_0_HP = 100
+Pierrot_pattern_0_x_pos = -1000
+Pierrot_pattern_0_y_pos = screen_height - stage_height - Pierrot_pattern_0_height
+
+Pierrot_y_pos = screen_height - stage_height - Pierrot_pattern_0_height - Pierrot_height
 
 Pierrot_ball_image = [
     pygame.image.load(os.path.join(image_path, "Pierrot_ball_1.png")),
@@ -250,7 +261,7 @@ while running:
                     Leon_using = True
                 elif Pierrot_HP >= 1:
                     Pierrot_using = True
-                    Pierrot_x_pos = 0
+                    Pierrot_x_pos = (Pierrot_pattern_0_width - Pierrot_width) / 2
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
@@ -352,8 +363,27 @@ while running:
         else:
             Pierrot_patterns = [1, 6, 7]
             pass
-        random.choice(Pierrot_patterns)
+        Pierrot_status = random.choice(Pierrot_patterns)
 
+    #패턴 작동 코드
+    if Pierrot_using == True:
+        if Pierrot_status == 1:
+            pass
+
+    if Pierrot_using == True and Pierrot_stun == 0:
+        Pierrot_pattern_0_x_pos = 0
+        Pierrot_y_pos = screen_height - stage_height - Pierrot_pattern_0_height - Pierrot_height
+
+    if Pierrot_using == True and Pierrot_stun == 1:
+        Pierrot_pattern_0_x_pos = -1000
+        Pierrot_y_pos = screen_height - stage_height - Pierrot_height
+        Pierrot_stun_start_time = pygame.time.get_ticks()
+        Pierrot_stun = 11
+    
+    if Pierrot_using == True and Pierrot_stun == 11:
+        if pygame.time.get_ticks() - Pierrot_stun_start_time >= 3000:
+            Pierrot_pattern_0_HP = 100
+            Pierrot_stun = 0
     # 4. 충돌 처리 
     # 필수 (캐릭터 크기를 재는 함수들)
     character_boshy_rect = character_boshy.get_rect()
@@ -382,6 +412,12 @@ while running:
     Leon_pattern_2_rect.top = Leon_pattern_2_y_pos
 
     Pierrot_rect = Pierrot.get_rect()
+    Pierrot_rect.left = Pierrot_x_pos
+    Pierrot_rect.top = Pierrot_y_pos
+    Pierrot_pattern_0_rect = Pierrot_pattern_0.get_rect()
+    Pierrot_pattern_0_rect.left = Pierrot_pattern_0_x_pos
+    Pierrot_pattern_0_rect.top = Pierrot_pattern_0_y_pos
+
     Pierrot_ball_1_rect = Pierrot_ball_image[0].get_rect()
     Pierrot_ball_2_rect = Pierrot_ball_image[1].get_rect()
     Pierrot_ball_3_rect = Pierrot_ball_image[2].get_rect()
@@ -420,6 +456,8 @@ while running:
         
         elif bullet_rect.colliderect(Pierrot_rect):
             Pierrot_HP -= 1
+            if Pierrot_HP == 899:
+                Pierrot_status = 0 
             if 600 <= Pierrot_HP < 900:
                 Pierrot_phase = 1
             elif 300 <= Pierrot_HP < 600:
@@ -430,6 +468,12 @@ while running:
                 Pierrot_using = False
                 character_boshy_Exp += Leon_Exp
             bullet_to_remove = bullet_idx
+
+        elif bullet_rect.colliderect(Pierrot_pattern_0_rect):
+            Pierrot_pattern_0_HP -= 1
+            bullet_to_remove = bullet_idx
+            if Pierrot_pattern_0_HP <= 0:
+                Pierrot_stun = 1
 
         if bullet_to_remove > -1: # bullet_to_remove의 최초값은 -1
             if bullet_img_idx == 0:
@@ -593,6 +637,11 @@ while running:
         else:
             for i in range(1, Pierrot_HP % 300+1):
                 screen.blit(Pierrot_HP_bar_1, (2*i-2, 0))
+        for i in range(1, Pierrot_pattern_0_HP+1):
+            screen.blit(Pierrot_pattern_0_HP_bar, (6*i-6, 10))
+
+    if Pierrot_stun == 0 and Pierrot_using == True:
+        screen.blit(Pierrot_pattern_0, (Pierrot_pattern_0_x_pos, Pierrot_pattern_0_y_pos))
 
     # 모든 총알에 대해 정보를 불러와 그리기
     for idx, val in enumerate(bullets): 
