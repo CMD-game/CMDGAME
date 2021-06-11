@@ -456,7 +456,7 @@ while running:
         
         elif bullet_rect.colliderect(Pierrot_rect):
             Pierrot_HP -= 1
-            if Pierrot_HP == 899:
+            if Pierrot_HP == 899 and Pierrot_pattern_0_HP == 100:
                 Pierrot_status = 0 
             if 600 <= Pierrot_HP < 900:
                 Pierrot_phase = 1
@@ -471,6 +471,9 @@ while running:
 
         elif bullet_rect.colliderect(Pierrot_pattern_0_rect):
             Pierrot_pattern_0_HP -= 1
+            if Pierrot_HP == 900 and Pierrot_pattern_0_HP == 99:
+                Pierrot_status = 0
+                Pierrot_phase = 1
             bullet_to_remove = bullet_idx
             if Pierrot_pattern_0_HP <= 0:
                 Pierrot_stun = 1
@@ -615,10 +618,7 @@ while running:
         else:
             screen.blit(character_boshy, (character_boshy_x_pos, character_boshy_y_pos))
     
-    #캐릭터 체력
-    for i in range(1, character_boshy_HP+1): # range 범위 : 이상 미만
-        screen.blit(character_HP_bar, (screen_width - 30*i - 12, 10))
-
+    #체력 표시
     if Leon_using == True:
         for i in range(1, Leon_HP+1):
             screen.blit(Leon_HP_bar, (3*i-3, 0))
@@ -637,8 +637,12 @@ while running:
         else:
             for i in range(1, Pierrot_HP % 300+1):
                 screen.blit(Pierrot_HP_bar_1, (2*i-2, 0))
-        for i in range(1, Pierrot_pattern_0_HP+1):
-            screen.blit(Pierrot_pattern_0_HP_bar, (6*i-6, 10))
+        if Pierrot_phase >= 1:
+            for i in range(1, Pierrot_pattern_0_HP+1):
+                screen.blit(Pierrot_pattern_0_HP_bar, (6*i-6, 10))
+
+    for i in range(1, character_boshy_HP+1): # range 범위 : 이상 미만
+        screen.blit(character_HP_bar, (screen_width - 30*i - 12, 10))
 
     if Pierrot_stun == 0 and Pierrot_using == True:
         screen.blit(Pierrot_pattern_0, (Pierrot_pattern_0_x_pos, Pierrot_pattern_0_y_pos))
