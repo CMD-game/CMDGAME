@@ -64,9 +64,10 @@ stage_height = stage_size[1]
 
 character_HP_bar = pygame.image.load(os.path.join(image_path, "HP_bar.png"))
 Leon_HP_bar = pygame.image.load(os.path.join(image_path, "Leon_HP_bar.png"))
-untitled_HP_bar_1 = pygame.image.load(os.path.join(image_path, "untitled_HP_bar_1.png"))
-untitled_HP_bar_2 = pygame.image.load(os.path.join(image_path, "untitled_HP_bar_2.png"))
-untitled_HP_bar_3 = pygame.image.load(os.path.join(image_path, "untitled_HP_bar_3.png"))
+Pierrot_HP_bar_1 = pygame.image.load(os.path.join(image_path, "Pierrot_HP_bar_1.png"))
+Pierrot_HP_bar_2 = pygame.image.load(os.path.join(image_path, "Pierrot_HP_bar_2.png"))
+Pierrot_HP_bar_3 = pygame.image.load(os.path.join(image_path, "Pierrot_HP_bar_3.png"))
+Pierrot_pattern_0_HP_bar = pygame.image.load(os.path.join(image_path, "Pierrot_pattern_0_HP_bar.png"))
 
 # 플랫폼(발판)
 platform = pygame.image.load(os.path.join(image_path, "M_platform.png"))
@@ -163,28 +164,28 @@ Leon_HP = 200
 Leon_using = False
 Leon_status = -1
 
-#보스2 - untitled
-untitled = pygame.image.load(os.path.join(image_path, "untitled.png"))
-untitled_size = untitled.get_rect().size
-untitled_width = untitled_size[0]
-untitled_height = untitled_size[1]
-untitled_HP = 900 # 300 * 3phase
-untitled_phase = 0
-untitled_x_pos = -1000
-untitled_y_pos = 0
-untitled_using = False
-untitled_status = 0
-
-#보스 삐에로
+#보스2 - Pierrot
 Pierrot = pygame.image.load(os.path.join(image_path, "Pierrot.png"))
 Pierrot_size = Pierrot.get_rect().size
 Pierrot_width = Pierrot_size[0]
 Pierrot_height = Pierrot_size[1]
-Pierrot_x_pos = 0
-Pierrot_y_pos = screen_height - Pierrot_height - stage_height
-Pierrot_Exp = 100
-Pierrot_HP = 200
+Pierrot_HP = 900 # 300 * 3phase
+Pierrot_phase = 0
+Pierrot_x_pos = -1000
 Pierrot_using = False
+Pierrot_status = -1
+Pierrot_stun = 0
+
+Pierrot_pattern_0 = pygame.image.load(os.path.join(image_path, "Pierrot_pattern_0.png"))
+Pierrot_pattern_0_size = Pierrot_pattern_0.get_rect().size
+Pierrot_pattern_0_width = Pierrot_pattern_0_size[0]
+Pierrot_pattern_0_height = Pierrot_pattern_0_size[1]
+Pierrot_pattern_0_HP = 100
+Pierrot_pattern_0_x_pos = -1000
+Pierrot_pattern_0_y_pos = screen_height - stage_height - Pierrot_pattern_0_height
+
+Pierrot_y_pos = screen_height - stage_height - Pierrot_pattern_0_height - Pierrot_height
+
 Pierrot_ball_image = [
     pygame.image.load(os.path.join(image_path, "Pierrot_ball_1.png")),
     pygame.image.load(os.path.join(image_path, "Pierrot_ball_2.png")),
@@ -261,9 +262,9 @@ while running:
                     slime_using = False
                     Slime = False
                     Leon_using = True
-                elif untitled_HP >= 1:
-                    untitled_using = True
-                    untitled_x_pos = 0
+                elif Pierrot_HP >= 1:
+                    Pierrot_using = True
+                    Pierrot_x_pos = (Pierrot_pattern_0_width - Pierrot_width) / 2
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
@@ -355,18 +356,37 @@ while running:
             if pygame.time.get_ticks() - pattern_start_time >= Leon_delay_time:
                 Leon_status = 0
 
-    if untitled_using == True and untitled_status == 0:
-        if untitled_phase == 1:
-            untitled_patterns = [1, 2, 3]
+    if Pierrot_using == True and Pierrot_status == 0:
+        if Pierrot_phase == 1:
+            Pierrot_patterns = [1, 2, 3]
             pass # 패턴 설계중 : 공통(강화) 패턴 1개, phase별 패턴 1~3개
-        elif untitled_phase == 2:
-            untitled_patterns = [1, 4, 5]
+        elif Pierrot_phase == 2:
+            Pierrot_patterns = [1, 4, 5]
             pass
         else:
-            untitled_patterns = [1, 6, 7]
+            Pierrot_patterns = [1, 6, 7]
             pass
-        random.choice(untitled_patterns)
+        Pierrot_status = random.choice(Pierrot_patterns)
 
+    #패턴 작동 코드
+    if Pierrot_using == True:
+        if Pierrot_status == 1:
+            pass
+
+    if Pierrot_using == True and Pierrot_stun == 0:
+        Pierrot_pattern_0_x_pos = 0
+        Pierrot_y_pos = screen_height - stage_height - Pierrot_pattern_0_height - Pierrot_height
+
+    if Pierrot_using == True and Pierrot_stun == 1:
+        Pierrot_pattern_0_x_pos = -1000
+        Pierrot_y_pos = screen_height - stage_height - Pierrot_height
+        Pierrot_stun_start_time = pygame.time.get_ticks()
+        Pierrot_stun = 11
+    
+    if Pierrot_using == True and Pierrot_stun == 11:
+        if pygame.time.get_ticks() - Pierrot_stun_start_time >= 3000:
+            Pierrot_pattern_0_HP = 100
+            Pierrot_stun = 0
     # 4. 충돌 처리 
     # 필수 (캐릭터 크기를 재는 함수들)
     character_boshy_rect = character_boshy.get_rect()
@@ -379,9 +399,9 @@ while running:
     Leon_rect = Leon.get_rect()
     Leon_rect.left = Leon_x_pos
     Leon_rect.top = Leon_y_pos
-    untitled_rect = untitled.get_rect()
-    untitled_rect.left = untitled_x_pos
-    untitled_rect.top = untitled_y_pos
+    Pierrot_rect = Pierrot.get_rect()
+    Pierrot_rect.left = Pierrot_x_pos
+    Pierrot_rect.top = Pierrot_y_pos
 
     platform_rect = platform.get_rect()
     platform_rect.left = platform_x_pos
@@ -396,7 +416,12 @@ while running:
 
     #삐에로 크기
     Pierrot_rect = Pierrot.get_rect()
-    
+    Pierrot_rect.left = Pierrot_x_pos
+    Pierrot_rect.top = Pierrot_y_pos
+    Pierrot_pattern_0_rect = Pierrot_pattern_0.get_rect()
+    Pierrot_pattern_0_rect.left = Pierrot_pattern_0_x_pos
+    Pierrot_pattern_0_rect.top = Pierrot_pattern_0_y_pos
+
     #삐에로의 공 크기
     for Pierrot_ball_idx, Pierrot_ball_val in enumerate(Pierrot_ball):
         ball_pos_x = Pierrot_ball_val["pos_x"]
@@ -406,7 +431,6 @@ while running:
         ball_rect = Pierrot_ball_image[Pierrot_ball_idx].get_rect()
         ball_rect.left = ball_pos_x
         ball_rect.top = ball_pos_y
-
 
 
     # 총알 위치 정의
@@ -440,18 +464,29 @@ while running:
                 character_boshy_Exp += Leon_Exp
             bullet_to_remove = bullet_idx
         
-        elif bullet_rect.colliderect(untitled_rect):
-            untitled_HP -= 1
-            if 600 <= untitled_HP < 900:
-                untitled_phase = 1
-            elif 300 <= untitled_HP < 600:
-                untitled_phase = 2
-            elif 0 < untitled_HP < 300:
-                untitled_phase = 3
-            elif untitled_HP <= 0:
-                untitled_using = False
+        elif bullet_rect.colliderect(Pierrot_rect):
+            Pierrot_HP -= 1
+            if Pierrot_HP == 899 and Pierrot_pattern_0_HP == 100:
+                Pierrot_status = 0 
+            if 600 <= Pierrot_HP < 900:
+                Pierrot_phase = 1
+            elif 300 <= Pierrot_HP < 600:
+                Pierrot_phase = 2
+            elif 0 < Pierrot_HP < 300:
+                Pierrot_phase = 3
+            elif Pierrot_HP <= 0:
+                Pierrot_using = False
                 character_boshy_Exp += Leon_Exp
             bullet_to_remove = bullet_idx
+
+        elif bullet_rect.colliderect(Pierrot_pattern_0_rect):
+            Pierrot_pattern_0_HP -= 1
+            if Pierrot_HP == 900 and Pierrot_pattern_0_HP == 99:
+                Pierrot_status = 0
+                Pierrot_phase = 1
+            bullet_to_remove = bullet_idx
+            if Pierrot_pattern_0_HP <= 0:
+                Pierrot_stun = 1
 
         if bullet_to_remove > -1: # bullet_to_remove의 최초값은 -1
             if bullet_img_idx == 0:
@@ -566,16 +601,15 @@ while running:
     if Leon_using == True:
         screen.blit(Leon, (Leon_x_pos, Leon_y_pos))
 
-    if untitled_using == True:
-        screen.blit(untitled, (untitled_x_pos, untitled_y_pos))
-
-    #공 튕기기
     for idx, val in enumerate(Pierrot_ball):
         Pierrot_ball_pos_x = val["pos_x"]
         Pierrot_ball_pos_y = val["pos_y"]
         Pierrot_ball_img_idx = val["img_idx"]
         screen.blit(Pierrot_ball_image[Pierrot_ball_img_idx], (Pierrot_ball_pos_x, Pierrot_ball_pos_y))
-    
+        
+    if Pierrot_using == True:
+        screen.blit(Pierrot, (Pierrot_x_pos, Pierrot_y_pos))
+
     # 무적 시간에 깜빡임 구현 (더 나은 방안이 있으면 수정 바람)
     if invincibility == True: 
         if int((pygame.time.get_ticks() - start_ticks - invincibility_time) / 250) % 2 == 0:
@@ -599,28 +633,34 @@ while running:
         else:
             screen.blit(character_boshy, (character_boshy_x_pos, character_boshy_y_pos))
     
-    #캐릭터 체력
-    for i in range(1, character_boshy_HP+1): # range 범위 : 이상 미만
-        screen.blit(character_HP_bar, (screen_width - 30*i - 12, 10))
-
+    #체력 표시
     if Leon_using == True:
         for i in range(1, Leon_HP+1):
             screen.blit(Leon_HP_bar, (3*i-3, 0))
 
-    if untitled_using == True:
-        if untitled_phase == 1:
+    if Pierrot_using == True:
+        if Pierrot_phase == 1:
             for i in range(1, 301):
-                screen.blit(untitled_HP_bar_2, (2*i-2, 0))
-            for i in range(1, untitled_HP % 300 + 1):
-                screen.blit(untitled_HP_bar_3, (2*i-2, 0))
-        elif untitled_phase == 2:
+                screen.blit(Pierrot_HP_bar_2, (2*i-2, 0))
+            for i in range(1, Pierrot_HP % 300 + 1):
+                screen.blit(Pierrot_HP_bar_3, (2*i-2, 0))
+        elif Pierrot_phase == 2:
             for i in range(1, 301):
-                screen.blit(untitled_HP_bar_1, (2*i-2, 0))
-            for i in range(1, untitled_HP % 300+1):
-                screen.blit(untitled_HP_bar_2, (2*i-2, 0))
+                screen.blit(Pierrot_HP_bar_1, (2*i-2, 0))
+            for i in range(1, Pierrot_HP % 300+1):
+                screen.blit(Pierrot_HP_bar_2, (2*i-2, 0))
         else:
-            for i in range(1, untitled_HP % 300+1):
-                screen.blit(untitled_HP_bar_1, (2*i-2, 0))
+            for i in range(1, Pierrot_HP % 300+1):
+                screen.blit(Pierrot_HP_bar_1, (2*i-2, 0))
+        if Pierrot_phase >= 1:
+            for i in range(1, Pierrot_pattern_0_HP+1):
+                screen.blit(Pierrot_pattern_0_HP_bar, (6*i-6, 10))
+
+    for i in range(1, character_boshy_HP+1): # range 범위 : 이상 미만
+        screen.blit(character_HP_bar, (screen_width - 30*i - 12, 10))
+
+    if Pierrot_stun == 0 and Pierrot_using == True:
+        screen.blit(Pierrot_pattern_0, (Pierrot_pattern_0_x_pos, Pierrot_pattern_0_y_pos))
 
     # 모든 총알에 대해 정보를 불러와 그리기
     for idx, val in enumerate(bullets): 
