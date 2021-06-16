@@ -695,7 +695,7 @@ while running:
         if Pierrot_phase == 1:
             for i in range(1, 301):
                 screen.blit(Pierrot_HP_bar_2, (2*i-2, 0))
-            for i in range(1, Pierrot_HP % 300 + 1):
+            for i in range(1, Pierrot_HP % 301 + 3):
                 screen.blit(Pierrot_HP_bar_3, (2*i-2, 0))
         elif Pierrot_phase == 2:
             for i in range(1, 301):
