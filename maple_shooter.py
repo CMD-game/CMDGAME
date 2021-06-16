@@ -200,6 +200,7 @@ ball_speed_y = [-18, -15, -12, -9] #index 0, 1, 2, 3에 해당하는 값
 
 #공들
 Pierrot_ball = []
+ball_to_remove = -1
 
 #최초 발생한는 큰 공 추가
 Pierrot_ball.append({
@@ -420,18 +421,42 @@ while running:
     Pierrot_rect.top = Pierrot_y_pos
     Pierrot_pattern_0_rect = Pierrot_pattern_0.get_rect()
     Pierrot_pattern_0_rect.left = Pierrot_pattern_0_x_pos
-    Pierrot_pattern_0_rect.top = Pierrot_pattern_0_y_pos
+    Pierrot_pattern_0_rect.top = Pierrot_pattern_0_y_pos                
 
-    #삐에로의 공 크기
+    #공 위치 정의
     for Pierrot_ball_idx, Pierrot_ball_val in enumerate(Pierrot_ball):
         ball_pos_x = Pierrot_ball_val["pos_x"]
         ball_pos_y = Pierrot_ball_val["pos_y"]
         ball_img_idx = Pierrot_ball_val["img_idx"]
-        
+        ball_size = Pierrot_ball_image[Pierrot_ball_idx].get_rect().size
+        ball_width = ball_size[0]
+        ball_height = ball_size[1]
         ball_rect = Pierrot_ball_image[Pierrot_ball_idx].get_rect()
         ball_rect.left = ball_pos_x
         ball_rect.top = ball_pos_y
 
+        if ball_pos_x < 0 or ball_pos_x > (screen_width - ball_width): #공이 벽에서 튕기게 하기
+            Pierrot_ball_val["to_x"] = Pierrot_ball_val["to_x"] * -1
+        
+        if ball_pos_y >=screen_height - stage_height - ball_height:
+            Pierrot_ball_val["to_y"] = Pierrot_ball_val["init_spd_y"]
+            ball_to_remove = ball_img_idx
+        elif ball_rect.colliderect(platform_rect) and Pierrot_ball_val["to_y"] >= 0:
+            Pierrot
+        else:
+            Pierrot_ball_val["to_y"] += 0.5
+
+        if invincibility == 0:
+            if character_boshy_rect.colliderect(ball_rect):
+                character_boshy_HP -= Pierrot__attack
+                invincibility = 2
+
+        if ball_to_remove > -1:
+            del Pierrot_ball[ball_to_remove]
+            ball_to_remove = -1
+            
+        Pierrot_ball_val["pos_x"] += Pierrot_ball_val["to_x"]
+        Pierrot_ball_val["pos_y"] += Pierrot_ball_val["to_y"]
 
     # 총알 위치 정의
     for bullet_idx, bullet_val in enumerate(bullets):
@@ -535,7 +560,7 @@ while running:
         Leon_x_pos = -1000
         Leon_pattern_1_x_pos = -1000
 
-    #무적이 아닐 때
+    #무적이 아닐 때 캐릭터 충돌
     if invincibility == 0:
         if character_boshy_rect.colliderect(slime_rect): # 캐릭터와 슬라임이 충돌
             character_boshy_HP -= slime_attack
@@ -543,9 +568,7 @@ while running:
         elif character_boshy_rect.colliderect(Leon_rect) or character_boshy_rect.colliderect(Leon_pattern_1_rect) or character_boshy_rect.colliderect(Leon_pattern_2_rect):
             character_boshy_HP -= Leon_attack
             invincibility = 2
-        elif character_boshy_rect.colliderect(ball_rect):
-            character_boshy_HP -= Pierrot__attack
-            invincibility = 2        
+
         if character_boshy_HP <= 0:
             Game_over_check = 1
             running = False
@@ -557,25 +580,6 @@ while running:
         if (pygame.time.get_ticks() - start_ticks) - invincibility_time >= 1000: # 1000: 무적 시간(ms)
             invincibility = 0
 
-    #공 위치 정의
-    for Pierrot_ball_idx, Pierrot_ball_val in enumerate(Pierrot_ball):
-        ball_pos_x = Pierrot_ball_val["pos_x"]
-        ball_pos_y = Pierrot_ball_val["pos_y"]
-        ball_img_idx = Pierrot_ball_val["img_idx"]
-        ball_size = Pierrot_ball_image[Pierrot_ball_idx].get_rect().size
-        ball_width = ball_size[0]
-        ball_height = ball_size[1]
-
-        if ball_pos_x < 0 or ball_pos_x > (screen_width - ball_width): #공이 벽에서 튕기게 하기
-            Pierrot_ball_val["to_x"] = Pierrot_ball_val["to_x"] * -1
-        
-        if ball_pos_y >=screen_height - stage_height - ball_height:
-            Pierrot_ball_val["to_y"] = Pierrot_ball_val["init_spd_y"]
-        else:
-            Pierrot_ball_val["to_y"] += 0.5
-
-        Pierrot_ball_val["pos_x"] += Pierrot_ball_val["to_x"]
-        Pierrot_ball_val["pos_y"] += Pierrot_ball_val["to_y"] ####화면 그리기(x)
 
     # 게임 화면 표시
     Level = game_font.render("Lv.{}".format(int(character_boshy_Level)), True, (255, 255, 0))
@@ -605,7 +609,7 @@ while running:
         Pierrot_ball_pos_x = val["pos_x"]
         Pierrot_ball_pos_y = val["pos_y"]
         Pierrot_ball_img_idx = val["img_idx"]
-        screen.blit(Pierrot_ball_image[Pierrot_ball_img_idx], (Pierrot_ball_pos_x, Pierrot_ball_pos_y))
+        screen.blit(Pierrot_ball_image[Pierrot_ball_img_idx], (Pierrot_ball_pos_x, Pierrot_ball_pos_y)) 
 
     if Pierrot_using == True:
         screen.blit(Pierrot, (Pierrot_x_pos, Pierrot_y_pos))
