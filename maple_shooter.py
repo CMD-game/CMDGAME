@@ -545,7 +545,7 @@ while running:
             invincibility = 2
         elif character_boshy_rect.colliderect(ball_rect):
             character_boshy_HP -= Pierrot__attack
-            invincibility = 2
+            invincibility = 2        
         if character_boshy_HP <= 0:
             Game_over_check = 1
             running = False
@@ -606,10 +606,10 @@ while running:
         Pierrot_ball_pos_y = val["pos_y"]
         Pierrot_ball_img_idx = val["img_idx"]
         screen.blit(Pierrot_ball_image[Pierrot_ball_img_idx], (Pierrot_ball_pos_x, Pierrot_ball_pos_y))
-        
+
     if Pierrot_using == True:
         screen.blit(Pierrot, (Pierrot_x_pos, Pierrot_y_pos))
-
+    
     # 무적 시간에 깜빡임 구현 (더 나은 방안이 있으면 수정 바람)
     if invincibility == True: 
         if int((pygame.time.get_ticks() - start_ticks - invincibility_time) / 250) % 2 == 0:
@@ -632,8 +632,8 @@ while running:
             screen.blit(character_boshy_LEFT, (character_boshy_x_pos, character_boshy_y_pos))
         else:
             screen.blit(character_boshy, (character_boshy_x_pos, character_boshy_y_pos))
-    
-    #체력 표시
+
+    #체력 표시    
     if Leon_using == True:
         for i in range(1, Leon_HP+1):
             screen.blit(Leon_HP_bar, (3*i-3, 0))
