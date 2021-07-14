@@ -194,6 +194,15 @@ Pierrot_pattern_1_height = Pierrot_pattern_1_size[1]
 Pierrot_pattern_1_x_pos = -1000
 Pierrot_pattern_1_y_pos = screen_height - stage_height - Pierrot_pattern_1_height
 
+Pattern0_images = [
+    pygame.image.load(os.path.join(image_path, "Pattern0_1.png")),
+    pygame.image.load(os.path.join(image_path, "Pattern0_2.png")),
+    pygame.image.load(os.path.join(image_path, "Pattern0_3.png")),
+    pygame.image.load(os.path.join(image_path, "Pattern0_4.png"))
+]
+Pattern0_x_pos = 0
+Pattern0_y_pos = 50
+
 Pierrot_ball_image = [
     pygame.image.load(os.path.join(image_path, "Pierrot_ball_1.png")),
     pygame.image.load(os.path.join(image_path, "Pierrot_ball_2.png")),
@@ -288,14 +297,14 @@ while running:
                 event_attack = 1
             #보스 소환
             elif event.key == pygame.K_n:
-                if Leon_HP >= 1:
+                if Leon_HP >= 200:
                     slime_using = False
                     Slime = False
                     Leon_using = True
-                elif Pierrot_HP >= 1:
+                elif Pierrot_HP >= 900:
                     Pierrot_using = True
                     Pierrot_x_pos = (Pierrot_pattern_0_width - Pierrot_width) / 2
-            
+                    Pattern0_start_time = pygame.time.get_ticks()
             #공 소환
             elif event.key == pygame.K_b:
                 create_ball()
@@ -401,16 +410,32 @@ while running:
             Pierrot_patterns = [1, 6, 7]
             pass
         Pierrot_status = random.choice(Pierrot_patterns)
-        if Pattern0_start_time - pygame.time.get_ticks() >= 60000:
-            Pierrot_status = random[Pierrot_status, 10]
+        if pygame.time.get_ticks() - Pattern0_start_time >= 66000:
+            Pierrot_status = random.choice([Pierrot_status, 10])
 
     #패턴 작동 코드
     if Pierrot_using == True:
         if Pierrot_status == 10:
             Pattern0_start_time = pygame.time.get_ticks()
+            Pattern0_x_pos = 0
+            Pattern0_y_pos = 50
             Pierrot_status = 101
         if Pierrot_status == 101:
-            pass
+            if pygame.time.get_ticks() - Pattern0_start_time >= 1000:
+                Pierrot_status = 102
+        if Pierrot_status == 102:
+            if pygame.time.get_ticks() - Pattern0_start_time >= 2000:
+                Pierrot_status = 103
+        if Pierrot_status == 103:
+            if pygame.time.get_ticks() - Pattern0_start_time >= 3000:
+                Pierrot_status = 104
+        if Pierrot_status == 104:
+            Pattern0_x_pos += 2
+            Pattern0_y_pos += 2
+            if Pattern0_y_pos + 270 >= screen_height - stage_height:
+                character_boshy_HP = 0
+                running = False
+                Game_over_check = 1
         if Pierrot_status == 1:
             pattern_start_time = pygame.time.get_ticks()
             Pierrot_status = 11
@@ -552,7 +577,7 @@ while running:
             bullet_to_remove = bullet_idx
 
         elif bullet_rect.colliderect(Leon_rect):
-            Leon_HP -= 1
+            Leon_HP -= 50
             if Leon_HP == 199:
                 Leon_status = 0
             if Leon_HP <= 0:
@@ -566,7 +591,6 @@ while running:
             if Pierrot_status != 10 or 101 or 102 or 103 or 104:
                 Pierrot_HP -= 1
                 if Pierrot_HP == 899 and Pierrot_pattern_0_HP == 100:
-                    Pattern0_start_time = pygame.time.get_ticks()
                     Pierrot_status = 0 
                 if 600 <= Pierrot_HP < 900:
                     Pierrot_phase = 1
@@ -583,7 +607,6 @@ while running:
             Pierrot_pattern_0_HP -= 1
             if Pierrot_HP == 900 and Pierrot_pattern_0_HP == 99:
                 Pierrot_status = 0
-                Pattern0_start_time = pygame.time.get_ticks()
                 Pierrot_phase = 1
             bullet_to_remove = bullet_idx
             if Pierrot_pattern_0_HP <= 0:
@@ -644,9 +667,6 @@ while running:
         elif character_boshy_rect.colliderect(Leon_rect) or character_boshy_rect.colliderect(Leon_pattern_1_rect) or character_boshy_rect.colliderect(Leon_pattern_2_rect):
             character_boshy_HP -= Leon_attack
             invincibility = 2
-        elif character_boshy_rect.colliderect(ball_rect):
-            character_boshy_HP -= Pierrot_attack
-            invincibility = 2
         elif character_boshy_rect.colliderect(Pierrot_pattern_1_rect):
             character_boshy_HP -= Pierrot_attack
             invincibility = 2
@@ -686,12 +706,6 @@ while running:
     if Leon_using == True:
         screen.blit(Leon, (Leon_x_pos, Leon_y_pos))
 
-    for idx, val in enumerate(Pierrot_ball):
-        Pierrot_ball_pos_x = val["pos_x"]
-        Pierrot_ball_pos_y = val["pos_y"]
-        Pierrot_ball_img_idx = val["img_idx"]
-        screen.blit(Pierrot_ball_image[Pierrot_ball_img_idx], (Pierrot_ball_pos_x, Pierrot_ball_pos_y)) 
-
     if Pierrot_stun == 0 and Pierrot_using == True:
         screen.blit(Pierrot_pattern_0, (Pierrot_pattern_0_x_pos, Pierrot_pattern_0_y_pos))
 
@@ -699,6 +713,14 @@ while running:
         screen.blit(Pierrot, (Pierrot_x_pos, Pierrot_y_pos))
         if Pierrot_status == 12 or 121 or 13 or 131:
             screen.blit(Pierrot_pattern_1, (Pierrot_pattern_1_x_pos, Pierrot_pattern_1_y_pos))
+        if Pierrot_status == 101:
+            screen.blit(Pattern0_images[0], (0,50))
+        if Pierrot_status == 102:
+            screen.blit(Pattern0_images[1], (0,50))
+        if Pierrot_status == 103:
+            screen.blit(Pattern0_images[2], (0,50))
+        if Pierrot_status == 104:
+            screen.blit(Pattern0_images[3], (Pattern0_x_pos,Pattern0_y_pos))
     
     # 무적 시간에 깜빡임 구현 (더 나은 방안이 있으면 수정 바람)
     if invincibility == True: 
