@@ -438,11 +438,34 @@ while running:
         if ball_pos_x < 0 or ball_pos_x > (screen_width - ball_width): #공이 벽에서 튕기게 하기
             Pierrot_ball_val["to_x"] = Pierrot_ball_val["to_x"] * -1
         
-        if ball_pos_y >=screen_height - stage_height - ball_height:
+        if ball_pos_y >=screen_height - stage_height - ball_height: #공이 바닥에서 튕기게 하기
             Pierrot_ball_val["to_y"] = Pierrot_ball_val["init_spd_y"]
             ball_to_remove = ball_img_idx
-        elif ball_rect.colliderect(platform_rect) and Pierrot_ball_val["to_y"] >= 0:
-            Pierrot
+            if ball_img_idx < 3:#가장 작은 공이 아니라면
+                #나뉠 공 정보
+                small_ball_rect = Pierrot_ball_image[Pierrot_ball_idx + 1].get_rect()
+                small_ball_width = ball_size[0]
+                small_ball_height = ball_size[1]
+                #왼쪽으로 튕겨나갈 공
+                Pierrot_ball.append({
+                    "pos_x" : ball_pos_x + (ball_width/2) - (small_ball_width/2), #공의 x좌표
+                    "pos_y" : ball_pos_y + (ball_height/2) - (small_ball_height/2), #공의 y좌표
+                    "img_idx" : ball_img_idx + 1, #공의 이미지 인덱스
+                    "to_x" : -3, #x축의 이동방향, -3이면 왼쪽, 3이면 오른쪽으로
+                    "to_y" : -6, #y축 이동방향
+                    "init_spd_y" : ball_speed_y[ball_img_idx + 1] #y축 최초 속도
+                })
+                #오른쪽으로 튕겨나갈 공
+                Pierrot_ball.append({
+                    "pos_x" : ball_pos_x + (ball_width/2) - (small_ball_width/2), #공의 x좌표
+                    "pos_y" : ball_pos_y + (ball_height/2) - (small_ball_height/2), #공의 y좌표
+                    "img_idx" : ball_img_idx + 1, #공의 이미지 인덱스
+                    "to_x" : 3, #x축의 이동방향, -3이면 왼쪽, 3이면 오른쪽으로
+                    "to_y" : -6, #y축 이동방향
+                    "init_spd_y" : ball_speed_y[ball_img_idx + 1] #y축 최초 속도
+                })
+
+
         else:
             Pierrot_ball_val["to_y"] += 0.5
 
