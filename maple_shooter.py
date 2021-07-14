@@ -174,6 +174,7 @@ Pierrot_phase = 0
 Pierrot_x_pos = -1000
 Pierrot_using = False
 Pierrot_status = -1
+Pattern0_start_time = 0
 Pierrot_stun = 0
 
 Pierrot_pattern_0 = pygame.image.load(os.path.join(image_path, "Pierrot_pattern_0.png"))
@@ -375,9 +376,16 @@ while running:
             Pierrot_patterns = [1, 6, 7]
             pass
         Pierrot_status = random.choice(Pierrot_patterns)
+        if Pattern0_start_time - pygame.time.get_ticks() >= 60000:
+            Pierrot_status = random[Pierrot_status, 10]
 
     #패턴 작동 코드
     if Pierrot_using == True:
+        if Pierrot_status == 10:
+            Pattern0_start_time = pygame.time.get_ticks()
+            Pierrot_status = 101
+        if Pierrot_status == 101:
+            pass
         if Pierrot_status == 1:
             pattern_start_time = pygame.time.get_ticks()
             Pierrot_status = 11
@@ -481,7 +489,7 @@ while running:
             Pierrot_ball_val["to_y"] = Pierrot_ball_val["init_spd_y"]
             ball_to_remove = ball_img_idx
         elif ball_rect.colliderect(platform_rect) and Pierrot_ball_val["to_y"] >= 0:
-            Pierrot
+            pass
         else:
             Pierrot_ball_val["to_y"] += 0.5
 
@@ -529,24 +537,27 @@ while running:
             bullet_to_remove = bullet_idx
         
         elif bullet_rect.colliderect(Pierrot_rect):
-            Pierrot_HP -= 1
-            if Pierrot_HP == 899 and Pierrot_pattern_0_HP == 100:
-                Pierrot_status = 0 
-            if 600 <= Pierrot_HP < 900:
-                Pierrot_phase = 1
-            elif 300 <= Pierrot_HP < 600:
-                Pierrot_phase = 2
-            elif 0 < Pierrot_HP < 300:
-                Pierrot_phase = 3
-            elif Pierrot_HP <= 0:
-                Pierrot_using = False
-                character_boshy_Exp += Leon_Exp
-            bullet_to_remove = bullet_idx
+            if Pierrot_status != 10 or 101 or 102 or 103 or 104:
+                Pierrot_HP -= 1
+                if Pierrot_HP == 899 and Pierrot_pattern_0_HP == 100:
+                    Pattern0_start_time = pygame.time.get_ticks()
+                    Pierrot_status = 0 
+                if 600 <= Pierrot_HP < 900:
+                    Pierrot_phase = 1
+                elif 300 <= Pierrot_HP < 600:
+                    Pierrot_phase = 2
+                elif 0 < Pierrot_HP < 300:
+                    Pierrot_phase = 3
+                elif Pierrot_HP <= 0:
+                    Pierrot_using = False
+                    character_boshy_Exp += Leon_Exp
+                bullet_to_remove = bullet_idx
 
         elif bullet_rect.colliderect(Pierrot_pattern_0_rect):
             Pierrot_pattern_0_HP -= 1
             if Pierrot_HP == 900 and Pierrot_pattern_0_HP == 99:
                 Pierrot_status = 0
+                Pattern0_start_time = pygame.time.get_ticks()
                 Pierrot_phase = 1
             bullet_to_remove = bullet_idx
             if Pierrot_pattern_0_HP <= 0:
