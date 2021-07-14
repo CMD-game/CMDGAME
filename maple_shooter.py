@@ -207,11 +207,11 @@ Pierrot_attack = 1
 ball_speed_y = [-18, -15, -12, -9] #index 0, 1, 2, 3에 해당하는 값
 
 #공들
-Pierrot_ball = []
-ball_to_remove = -1
+Pierrot_ball = [] #생성된 공의 정보
+Pierrot_ball_bounce = [] #생성된 공의 튕긴 횟수 정보
+ball_to_remove = -1 #삭제할 공의 인덱스 정보
 
-#최초 발생한는 큰 공 추가
-Pierrot_ball.append({
+Pierrot_ball.append({ #최초 발생한는 큰 공 추가
     "pos_x" : 50, #공의 x좌표
     "pos_y" : 50, #공의 y좌표
     "img_idx" : 0, #공의 이미지 인덱스
@@ -219,6 +219,27 @@ Pierrot_ball.append({
     "to_y" : -6, #y축 이동방향
     "init_spd_y" : ball_speed_y[0] #y축 최초 속도
 })
+
+Pierrot_ball_bounce.append( #공 바닥에 튕긴 횟수 추가
+    0
+)
+    
+def create_ball():
+    random.seed(pygame.time.get_ticks())
+    x_pos = random.randrange(580)
+    Pierrot_ball.append({ #최초 발생한는 큰 공 추가
+        "pos_x" : x_pos, #공의 x좌표
+        "pos_y" : 50, #공의 y좌표
+        "img_idx" : 0, #공의 이미지 인덱스
+        "to_x" : 3, #x축의 이동방향, -3이면 왼쪽, 3이면 오른쪽으로
+        "to_y" : -6, #y축 이동방향
+        "init_spd_y" : ball_speed_y[0] #y축 최초 속도
+    })
+
+    Pierrot_ball_bounce.append( #공 바닥에 튕긴 횟수 추가
+        0
+    )
+    return
 
 
 # 필수
@@ -274,6 +295,10 @@ while running:
                 elif Pierrot_HP >= 1:
                     Pierrot_using = True
                     Pierrot_x_pos = (Pierrot_pattern_0_width - Pierrot_width) / 2
+            
+            #공 소환
+            elif event.key == pygame.K_b:
+                create_ball()
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
@@ -475,12 +500,13 @@ while running:
         ball_pos_x = Pierrot_ball_val["pos_x"]
         ball_pos_y = Pierrot_ball_val["pos_y"]
         ball_img_idx = Pierrot_ball_val["img_idx"]
-        ball_size = Pierrot_ball_image[Pierrot_ball_idx].get_rect().size
+        ball_size = Pierrot_ball_image[0].get_rect().size
         ball_width = ball_size[0]
         ball_height = ball_size[1]
-        ball_rect = Pierrot_ball_image[Pierrot_ball_idx].get_rect()
+        ball_rect = Pierrot_ball_image[0].get_rect()
         ball_rect.left = ball_pos_x
         ball_rect.top = ball_pos_y
+        ball_bounce = Pierrot_ball_bounce[Pierrot_ball_idx]
 
         if ball_pos_x < 0 or ball_pos_x > (screen_width - ball_width): #공이 벽에서 튕기게 하기
             Pierrot_ball_val["to_x"] = Pierrot_ball_val["to_x"] * -1
@@ -488,30 +514,7 @@ while running:
         if ball_pos_y >=screen_height - stage_height - ball_height: #공이 바닥에서 튕기게 하기
             Pierrot_ball_val["to_y"] = Pierrot_ball_val["init_spd_y"]
             ball_to_remove = ball_img_idx
-            if ball_img_idx < 3:#가장 작은 공이 아니라면
-                #나뉠 공 정보
-                small_ball_rect = Pierrot_ball_image[Pierrot_ball_idx + 1].get_rect()
-                small_ball_width = ball_size[0]
-                small_ball_height = ball_size[1]
-                #왼쪽으로 튕겨나갈 공
-                Pierrot_ball.append({
-                    "pos_x" : ball_pos_x + (ball_width/2) - (small_ball_width/2), #공의 x좌표
-                    "pos_y" : ball_pos_y + (ball_height/2) - (small_ball_height/2), #공의 y좌표
-                    "img_idx" : ball_img_idx + 1, #공의 이미지 인덱스
-                    "to_x" : -3, #x축의 이동방향, -3이면 왼쪽, 3이면 오른쪽으로
-                    "to_y" : -6, #y축 이동방향
-                    "init_spd_y" : ball_speed_y[ball_img_idx + 1] #y축 최초 속도
-                })
-                #오른쪽으로 튕겨나갈 공
-                Pierrot_ball.append({
-                    "pos_x" : ball_pos_x + (ball_width/2) - (small_ball_width/2), #공의 x좌표
-                    "pos_y" : ball_pos_y + (ball_height/2) - (small_ball_height/2), #공의 y좌표
-                    "img_idx" : ball_img_idx + 1, #공의 이미지 인덱스
-                    "to_x" : 3, #x축의 이동방향, -3이면 왼쪽, 3이면 오른쪽으로
-                    "to_y" : -6, #y축 이동방향
-                    "init_spd_y" : ball_speed_y[ball_img_idx + 1] #y축 최초 속도
-                })
-
+            Pierrot_ball_bounce[Pierrot_ball_idx] += 1 #공의 튕긴 횟수 기록
         else:
             Pierrot_ball_val["to_y"] += 0.5
 
@@ -520,8 +523,9 @@ while running:
                 character_boshy_HP -= Pierrot_attack
                 invincibility = 2
 
-        if ball_to_remove > -1:
+        if ball_to_remove > -1  and ball_bounce == 15: #공 제거 조건
             del Pierrot_ball[ball_to_remove]
+            del Pierrot_ball_bounce[ball_to_remove]
             ball_to_remove = -1
             
         Pierrot_ball_val["pos_x"] += Pierrot_ball_val["to_x"]
